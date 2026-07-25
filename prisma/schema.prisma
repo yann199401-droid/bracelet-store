@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  avatar    String   @default("")
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+
+  reviews       ProductReview[]
+  forumPosts    ForumPost[]
+  forumComments ForumComment[]
+  orders        Order[]
+  referrals     Referral[]       @relation("Referrer")
+  referredBy    Referral?        @relation("Referee")
+  coupons       Coupon[]
+}
+
+model Coupon {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  discount   Float
+  minAmount  Float
+  userId     Int
+  user       User      @relation(fields: [userId], references: [id])
+  usedAt     DateTime?
+  orderId    Int?      @unique
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model Referral {
+  id         Int      @id @default(autoincrement())
+  referrerId Int
+  referrer   User     @relation("Referrer", fields: [referrerId], references: [id])
+  refereeId  Int      @unique
+  referee    User     @relation("Referee", fields: [refereeId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String
+  material    String   @default("WOOD")
+  price       Float
+  sku         String   @unique
+  stock       Int      @default(0)
+  diameter    Float
+  lengthCm    Float
+  images      String   @default("[]")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  reviews ProductReview[]
+}
+
+model ProductReview {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  rating    Int
+  content   String
+  media     String   @default("[]")
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model ForumCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  posts ForumPost[]
+}
+
+model ForumPost {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  categoryId Int
+  userId     Int
+  viewCount  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  category ForumCategory @relation(fields: [categoryId], references: [id])
+  user     User          @relation(fields: [userId], references: [id])
+  comments ForumComment[]
+}
+
+model ForumComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  post ForumPost @relation(fields: [postId], references: [id])
+  user User      @relation(fields: [userId], references: [id])
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  items     String
+  total     Float
+  discount  Float    @default(0)
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+
+  customerName  String @default("")
+  customerEmail String @default("")
+  customerPhone String @default("")
+  customerAddr  String @default("")
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+}

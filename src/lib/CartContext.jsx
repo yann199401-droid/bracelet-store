@@ -1,0 +1,74 @@
+'use client'
+
+import { createContext, useContext, useReducer, useEffect } from 'react'
+
+const CartContext = createContext()
+
+const STORAGE_KEY = 'zencraft-cart'
+
+function loadCart() {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'ADD_ITEM': {
+      const existing = state.find((item) => item.id === action.product.id)
+      if (existing) {
+        return state.map((item) =>
+          item.id === action.product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      }
+      return [...state, { ...action.product, quantity: 1 }]
+    }
+    case 'REMOVE_ITEM':
+      return state.filter((item) => item.id !== action.id)
+    case 'UPDATE_QUANTITY':
+      if (action.quantity <= 0) {
+        return state.filter((item) => item.id !== action.id)
+      }
+      return state.map((item) =>
+        item.id === action.id ? { ...item, quantity: action.quantity } : item
+      )
+    case 'CLEAR':
+      return []
+    default:
+      return state
+  }
+}
+
+export function CartProvider({ children }) {
+  const [items, dispatch] = useReducer(cartReducer, [], loadCart)
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+  }, [items])
+
+  const addItem = (product) => dispatch({ type: 'ADD_ITEM', product })
+  const removeItem = (id) => dispatch({ type: 'REMOVE_ITEM', id })
+  const updateQuantity = (id, quantity) => dispatch({ type: 'UPDATE_QUANTITY', id, quantity })
+  const clearCart = () => dispatch({ type: 'CLEAR' })
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+
+  return (
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}>
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+export function useCart() {
+  const context = useContext(CartContext)
+  if (!context) throw new Error('useCart must be used within CartProvider')
+  return context
+}

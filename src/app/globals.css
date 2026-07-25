@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+:root {
+  --chinese-red: #B22222;
+  --chinese-gold: #D4A84B;
+  --chinese-ink: #1A1A2E;
+  --chinese-ivory: #F5F0E8;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-chinese-ink bg-chinese-ivory;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .chinese-border {
+    @apply border-2 border-chinese-gold relative;
+  }
+
+  .chinese-border::before {
+    content: '';
+    @apply absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-chinese-gold;
+  }
+
+  .chinese-border::after {
+    content: '';
+    @apply absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-chinese-gold;
+  }
+
+  .chinese-card {
+    @apply bg-white rounded-sm shadow-chinese border border-chinese-gold/30 overflow-hidden;
+  }
+
+  .chinese-btn-primary {
+    @apply bg-chinese-red text-white px-6 py-2.5 font-sans font-medium
+           hover:bg-chinese-red-dark transition-colors duration-300
+           tracking-wider text-sm uppercase;
+  }
+
+  .chinese-btn-gold {
+    @apply bg-chinese-gold text-chinese-ink px-6 py-2.5 font-sans font-medium
+           hover:bg-chinese-gold-dark hover:text-white transition-colors duration-300
+           tracking-wider text-sm;
+  }
+
+  .chinese-btn-outline {
+    @apply border-2 border-chinese-red text-chinese-red px-6 py-2 font-sans font-medium
+           hover:bg-chinese-red hover:text-white transition-colors duration-300
+           tracking-wider text-sm;
+  }
+
+  .chinese-input {
+    @apply w-full px-4 py-2.5 border border-chinese-gold/50 bg-white
+           focus:border-chinese-red focus:ring-1 focus:ring-chinese-red/30
+           outline-none transition-all duration-200 font-sans text-sm;
+  }
+
+  .chinese-section-title {
+    @apply font-serif text-3xl md:text-4xl text-center text-chinese-ink relative pb-6 mb-8;
+  }
+
+  .chinese-section-title::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-0.5 bg-chinese-gold;
+  }
+
+  .chinese-divider {
+    @apply h-0.5 bg-gradient-to-r from-transparent via-chinese-gold to-transparent my-12;
+  }
+
+  .cloud-bg {
+    @apply bg-chinese-ivory;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(212, 168, 75, 0.05) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 20%, rgba(178, 34, 34, 0.03) 0%, transparent 50%);
+  }
+
+  .lattice-pattern {
+    background-image:
+      linear-gradient(rgba(212, 168, 75, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 168, 75, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
