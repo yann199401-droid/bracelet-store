@@ -1,19 +1,15 @@
-let resendInstance = null
+const BREVO_API = 'https://api.brevo.com/v3/smtp/email'
 
-function getResend() {
-  if (!resendInstance) {
-    const key = process.env.RESEND_API_KEY
-    if (!key) {
-      console.warn('RESEND_API_KEY environment variable is not set — emails will not be sent')
-      return null
-    }
-    const { Resend } = require('resend')
-    resendInstance = new Resend(key)
+function getBrevoKey() {
+  const key = process.env.BREVO_API_KEY
+  if (!key) {
+    console.warn('BREVO_API_KEY environment variable is not set — emails will not be sent')
+    return null
   }
-  return resendInstance
+  return key
 }
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'Zen Craft Bracelets <noreply@braceletstore.zen>'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'Zen Craft Bracelets <noreply@myzenbeads.com>'
 const STORE_NAME = 'Zen Craft Bracelets'
 
 /**
@@ -149,51 +145,70 @@ function escapeHtml(text) {
 /**
  * Send an order confirmation email
  */
-export async function sendOrderConfirmation({ orderId, customerEmail, customerName, items, total, discount, shippingAddr, locale }) {
-  const resend = getResend()
-  if (!resend) {
-    console.log(`[Email] Would send order confirmation for #${orderId} to ${customerEmail} (no API key configured)`)
+async function sendViaBrevo({ to, subject, html }) {
+  const key = getBrevoKey()
+  if (!key) {
+    console.log(`[Email] Would send "${subject}" to ${to} (no API key configured)`)
     return { sent: false, reason: 'no_api_key' }
   }
 
+  // Parse FROM_EMAIL: "Name <email>" or just "email"
+  const match = FROM_EMAIL.match(/^(.+)\s+<([^>]+)>$/)
+  const sender = match ? { name: match[1].trim(), email: match[2].trim() } : { email: FROM_EMAIL }
+
+  try {
+    const res = await fetch(BREVO_API, {
+      method: 'POST',
+      headers: {
+        'api-key': key,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender,
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      }),
+    })
+
+    if (!res.ok) {
+      const err = await res.text()
+      throw new Error(`Brevo API ${res.status}: ${err}`)
+    }
+
+    console.log(`[Email] Sent "${subject}" to ${to}`)
+    return { sent: true }
+  } catch (error) {
+    console.error(`[Email] Failed to send "${subject}" to ${to}:`, error.message)
+    return { sent: false, reason: error.message }
+  }
+}
+
+export async function sendOrderConfirmation({ orderId, customerEmail, customerName, items, total, discount, shippingAddr, locale }) {
   const isZh = locale === 'zh'
   const subject = isZh
     ? `[禅意手作] 订单 #${orderId} 已确认 — 感谢您的购买！`
     : `[Zen Craft Bracelets] Order #${orderId} Confirmed — Thank You!`
 
-  try {
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [customerEmail],
-      subject,
-      html: buildOrderConfirmationHtml({
-        orderId,
-        customerName,
-        items,
-        total,
-        discount,
-        shippingAddr,
-        locale,
-      }),
-    })
-    console.log(`[Email] Order confirmation sent for #${orderId} to ${customerEmail}`)
-    return { sent: true }
-  } catch (error) {
-    console.error(`[Email] Failed to send order confirmation for #${orderId}:`, error.message)
-    return { sent: false, reason: error.message }
-  }
+  return sendViaBrevo({
+    to: customerEmail,
+    subject,
+    html: buildOrderConfirmationHtml({
+      orderId,
+      customerName,
+      items,
+      total,
+      discount,
+      shippingAddr,
+      locale,
+    }),
+  })
 }
 
 /**
  * Send a shipping notification email (for future use)
  */
 export async function sendShippingNotification({ orderId, customerEmail, customerName, trackingNumber, carrier, locale }) {
-  const resend = getResend()
-  if (!resend) {
-    console.log(`[Email] Would send shipping notification for #${orderId} to ${customerEmail} (no API key configured)`)
-    return { sent: false, reason: 'no_api_key' }
-  }
-
   const isZh = locale === 'zh'
   const subject = isZh
     ? `[禅意手作] 订单 #${orderId} 已发货！`
@@ -212,12 +227,10 @@ export async function sendShippingNotification({ orderId, customerEmail, custome
     ? '— 禅意手作 Zen Craft Bracelets 团队'
     : '— The Zen Craft Bracelets Team'
 
-  try {
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [customerEmail],
-      subject,
-      html: `
+  return sendViaBrevo({
+    to: customerEmail,
+    subject,
+    html: `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -258,11 +271,5 @@ export async function sendShippingNotification({ orderId, customerEmail, custome
   </table>
 </body>
 </html>`,
-    })
-    console.log(`[Email] Shipping notification sent for #${orderId} to ${customerEmail}`)
-    return { sent: true }
-  } catch (error) {
-    console.error(`[Email] Failed to send shipping notification for #${orderId}:`, error.message)
-    return { sent: false, reason: error.message }
-  }
+  })
 }
