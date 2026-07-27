@@ -1,18 +1,25 @@
 import prisma from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap() {
-  const baseUrl = 'http://localhost:3457'
+  const baseUrl = 'https://myzenbeads.com'
 
-  const products = await prisma.product.findMany({
-    select: { id: true, updatedAt: true },
-  })
+  let productUrls = []
+  try {
+    const products = await prisma.product.findMany({
+      select: { id: true, updatedAt: true },
+    })
 
-  const productUrls = products.map((product) => ({
-    url: `${baseUrl}/products/${product.id}`,
-    lastModified: product.updatedAt,
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }))
+    productUrls = products.map((product) => ({
+      url: `${baseUrl}/products/${product.id}`,
+      lastModified: product.updatedAt,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }))
+  } catch (e) {
+    // 构建时数据库不可用，跳过产品URL
+  }
 
   return [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
