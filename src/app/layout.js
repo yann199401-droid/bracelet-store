@@ -12,7 +12,10 @@ import { I18nProvider } from '@/lib/I18nContext'
 import { SidebarProvider } from '@/lib/SidebarContext'
 import { getLocale } from '@/lib/i18n-server'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3457'
+
 export const metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: '禅意手作 | Zen Craft Bracelets — 天然木石手串',
     template: '%s | 禅意手作 Zen Craft Bracelets',
@@ -20,7 +23,6 @@ export const metadata = {
   description: '精选天然木材与珍稀石材，手工打造每一串手串。传承东方美学，匠心独具。面向东南亚及全球客户。',
   keywords: ['手串', '木质手串', '石材手串', '禅意手作', 'Zen Craft Bracelets', '紫檀', '黄花梨', '和田玉', '玛瑙', '文玩', '天然木石手串'],
   authors: [{ name: '禅意手作 | Zen Craft Bracelets' }],
-  metadataBase: new URL('http://localhost:3457'),
   openGraph: {
     title: '禅意手作 | Zen Craft Bracelets — 天然木石手串',
     description: '精选天然木材与珍稀石材，手工打磨每一颗珠粒。让大自然的温度，陪伴你的每一天。',
