@@ -1,10 +1,13 @@
 import prisma from '@/lib/prisma'
 import Link from 'next/link'
+import { getLocale, t } from '@/lib/i18n-server'
 
 export const dynamic = 'force-dynamic'
 
 export default async function OrderPage({ params }) {
   const { id } = await params
+  const locale = getLocale();
+  const tr = (key, p) => t(locale, key, p);
   const order = await prisma.order.findUnique({ where: { id: parseInt(id) } })
 
   if (!order) {
@@ -30,24 +33,24 @@ export default async function OrderPage({ params }) {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-serif text-chinese-ink mb-2">下单成功！</h1>
-        <p className="text-gray-500 mb-8">感谢您的购买，我们会尽快处理您的订单。</p>
+        <h1 className="text-3xl font-serif text-chinese-ink mb-2">{tr('order.success')}</h1>
+        <p className="text-gray-500 mb-8">{tr('order.thanks')}</p>
 
         {/* Order Info */}
         <div className="bg-white border border-chinese-gold/20 p-6 text-left mb-8">
           <div className="mb-4 pb-4 border-b border-gray-100">
-            <p className="text-xs text-gray-400">订单编号</p>
+            <p className="text-xs text-gray-400">{tr('order.id')}</p>
             <p className="text-sm text-chinese-ink font-medium">#{order.id}</p>
           </div>
           <div className="mb-4 pb-4 border-b border-gray-100">
-            <p className="text-xs text-gray-400">订单状态</p>
+            <p className="text-xs text-gray-400">{tr('order.status')}</p>
             <p className="text-sm text-chinese-ink font-medium">
               {order.status === 'PENDING' ? '待处理' : order.status}
             </p>
           </div>
 
           <div className="mb-4 pb-4 border-b border-gray-100">
-            <p className="text-xs text-gray-400 mb-2">商品明细</p>
+            <p className="text-xs text-gray-400 mb-2">{tr('order.items')}</p>
             {items.map((item, i) => (
               <div key={i} className="flex justify-between text-sm py-1">
                 <span className="text-chinese-ink">{item.name} x{item.quantity}</span>
@@ -70,7 +73,7 @@ export default async function OrderPage({ params }) {
 
         {/* Customer Info */}
         <div className="bg-white border border-chinese-gold/20 p-6 text-left mb-8">
-          <h2 className="font-serif text-lg text-chinese-ink mb-3">收货信息</h2>
+          <h2 className="font-serif text-lg text-chinese-ink mb-3">{tr('checkout.shippingInfo')}</h2>
           <div className="space-y-2 text-sm">
             <p><span className="text-gray-400">姓名：</span>{order.customerName}</p>
             <p><span className="text-gray-400">邮箱：</span>{order.customerEmail}</p>
@@ -79,7 +82,7 @@ export default async function OrderPage({ params }) {
           </div>
         </div>
 
-        <Link href="/products" className="chinese-btn-primary">继续购物</Link>
+        <Link href="/products" className="chinese-btn-primary">{tr('order.continue')}</Link>
       </div>
     </div>
   )

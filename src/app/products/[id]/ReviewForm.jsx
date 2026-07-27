@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import StarRating from '@/components/ui/StarRating'
 import MediaUploader from '@/components/ui/MediaUploader'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function ReviewForm({ productId }) {
+  const { t } = useI18n()
   const [rating, setRating] = useState(0)
   const [content, setContent] = useState('')
   const [name, setName] = useState('')
@@ -42,7 +44,7 @@ export default function ReviewForm({ productId }) {
   if (status === 'success') {
     return (
       <div className="bg-green-50 border border-green-200 p-6 text-center">
-        <p className="text-green-700 font-medium">感谢您的评价！</p>
+        <p className="text-green-700 font-medium">{t('review.success')}</p>
         <p className="text-sm text-green-600 mt-1">您的评价和晒图将在审核后显示。</p>
       </div>
     )
@@ -50,7 +52,7 @@ export default function ReviewForm({ productId }) {
 
   return (
     <div className="bg-chinese-ivory-dark p-6">
-      <h3 className="font-serif text-lg text-chinese-ink mb-4">发表评价 + 晒图</h3>
+      <h3 className="font-serif text-lg text-chinese-ink mb-4">{t('review.title')}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm text-gray-600 mb-1">评分</label>
@@ -75,7 +77,7 @@ export default function ReviewForm({ productId }) {
             required
             rows={3}
             className="chinese-input resize-none"
-            placeholder="分享您对这款产品的使用感受..."
+            placeholder={t('review.placeholder')}
           />
         </div>
         <div>
@@ -83,9 +85,9 @@ export default function ReviewForm({ productId }) {
           <MediaUploader files={media} onChange={setMedia} maxFiles={6} />
         </div>
         <button type="submit" disabled={status === 'sending'} className="chinese-btn-gold">
-          {status === 'sending' ? '提交中...' : '提交评价'}
+          {status === 'sending' ? t('review.submitting') : t('review.submit')}
         </button>
-        {status === 'error' && <p className="text-red-600 text-sm">提交失败，请稍后重试。</p>}
+        {status === 'error' && <p className="text-red-600 text-sm">{t('review.error')}</p>}
       </form>
     </div>
   )

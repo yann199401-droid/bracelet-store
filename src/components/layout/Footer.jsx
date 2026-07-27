@@ -1,6 +1,26 @@
+'use client'
+
 import Link from 'next/link'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function Footer() {
+  const { t } = useI18n()
+
+  const quickLinks = [
+    { label: t('nav.home'), href: '/' },
+    { label: t('nav.products'), href: '/products' },
+    { label: t('nav.promotions'), href: '/promotions' },
+    { label: t('nav.about'), href: '/about' },
+    { label: t('nav.forum'), href: '/forum' },
+  ]
+
+  const categories = [
+    { label: t('footer.categoryWood'), href: '/products?material=WOOD' },
+    { label: t('footer.categoryStone'), href: '/products?material=STONE' },
+    { label: t('footer.categoryMixed'), href: '/products?material=MIXED' },
+    { label: t('footer.categoryNew'), href: '/products?sort=newest' },
+  ]
+
   return (
     <footer className="bg-chinese-ink text-gray-300">
       {/* Main Footer */}
@@ -13,12 +33,12 @@ export default function Footer() {
                 <span className="text-chinese-gold font-serif text-xl font-bold">禅</span>
               </div>
               <div>
-                <h3 className="text-chinese-gold font-serif text-lg">禅意手作</h3>
-                <p className="text-chinese-slate text-[10px] tracking-widest uppercase">Zen Craft Bracelets</p>
+                <h3 className="text-chinese-gold font-serif text-lg">{t('nav.brandName')}</h3>
+                <p className="text-chinese-slate text-[10px] tracking-widest uppercase">{t('nav.brandSub')}</p>
               </div>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              精选天然木材与石材，手工打造每一串手串。传承东方美学，匠心独具。
+              {t('footer.brandDesc')}
             </p>
             <div className="flex gap-3">
               {/* Facebook */}
@@ -65,15 +85,9 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-chinese-gold font-serif text-lg mb-4">快速链接</h4>
+            <h4 className="text-chinese-gold font-serif text-lg mb-4">{t('footer.quickLinks')}</h4>
             <ul className="space-y-2.5">
-              {[
-                { label: '首页', href: '/' },
-                { label: '所有产品', href: '/products' },
-                { label: '促销活动', href: '/promotions' },
-                { label: '关于我们', href: '/about' },
-                { label: '论坛', href: '/forum' },
-              ].map((link) => (
+              {quickLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -88,14 +102,9 @@ export default function Footer() {
 
           {/* Categories */}
           <div>
-            <h4 className="text-chinese-gold font-serif text-lg mb-4">产品分类</h4>
+            <h4 className="text-chinese-gold font-serif text-lg mb-4">{t('footer.categories')}</h4>
             <ul className="space-y-2.5">
-              {[
-                { label: '木质手串', href: '/products?material=WOOD' },
-                { label: '石材手串', href: '/products?material=STONE' },
-                { label: '混合材质', href: '/products?material=MIXED' },
-                { label: '新品上架', href: '/products?sort=newest' },
-              ].map((link) => (
+              {categories.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -110,7 +119,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-chinese-gold font-serif text-lg mb-4">联系我们</h4>
+            <h4 className="text-chinese-gold font-serif text-lg mb-4">{t('footer.contact')}</h4>
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-start gap-2">
                 <svg className="w-4 h-4 text-chinese-gold mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,7 +138,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>中国 · 苏州</span>
+                <span>{t('footer.location')}</span>
               </li>
             </ul>
           </div>
@@ -140,66 +149,66 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Shipping */}
             <div>
-              <h4 className="text-xs text-gray-500 tracking-wider mb-4">合作物流</h4>
-              <div className="flex items-center gap-4">
+              <h4 className="text-chinese-gold font-serif text-lg mb-4">{t('footer.shipping')}</h4>
+              <div className="flex items-center flex-wrap gap-4">
                 {/* FedEx */}
-                <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded">
-                  <svg className="w-8 h-6" viewBox="0 0 80 32" fill="none">
+                <div className="flex items-center gap-2 bg-white/5 px-5 py-2.5 rounded">
+                  <svg className="w-20 h-14" viewBox="0 0 80 32" fill="none">
                     <rect width="80" height="32" rx="4" fill="#fff" opacity="0.15"/>
                     <text x="12" y="20" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="14" fill="#D4A84B">FedEx</text>
                   </svg>
-                  <span className="text-[10px] text-gray-500">Express</span>
+                  <span className="text-xs text-gray-500">{t('footer.express')}</span>
                 </div>
                 {/* DHL */}
-                <div className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded">
-                  <svg className="w-8 h-6" viewBox="0 0 80 32" fill="none">
+                <div className="flex items-center gap-2 bg-white/5 px-5 py-2.5 rounded">
+                  <svg className="w-20 h-14" viewBox="0 0 80 32" fill="none">
                     <rect width="80" height="32" rx="4" fill="#fff" opacity="0.15"/>
                     <text x="16" y="20" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="13" fill="#D4A84B">DHL</text>
                   </svg>
-                  <span className="text-[10px] text-gray-500">Express</span>
+                  <span className="text-xs text-gray-500">{t('footer.express')}</span>
                 </div>
-                <span className="text-[10px] text-gray-500">全球配送 · 满 $50 免邮</span>
+                {/* DDP */}
+                <div className="flex items-center gap-2 bg-white/5 px-5 py-2.5 rounded">
+                  <div className="w-20 h-14 flex items-center justify-center">
+                    <span className="text-chinese-gold font-bold text-lg tracking-wider">DDP</span>
+                  </div>
+                  <span className="text-xs text-gray-500">Duty Paid</span>
+                </div>
+                <span className="text-xs text-gray-500">{t('footer.freeShipping')}</span>
               </div>
             </div>
             {/* Payment */}
             <div>
-              <h4 className="text-xs text-gray-500 tracking-wider mb-4">支付方式</h4>
+              <h4 className="text-chinese-gold font-serif text-lg mb-4">{t('footer.payment')}</h4>
               <div className="flex flex-wrap items-center gap-3">
-                {/* Visa */}
-                <div className="w-10 h-7 bg-white/10 rounded flex items-center justify-center">
-                  <svg className="w-8 h-5" viewBox="0 0 48 28" fill="none">
+                <div className="w-20 h-14 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-16 h-10" viewBox="0 0 48 28" fill="none">
                     <text x="6" y="18" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="11" fill="#D4A84B">VISA</text>
                   </svg>
                 </div>
-                {/* MasterCard */}
-                <div className="w-10 h-7 bg-white/10 rounded flex items-center justify-center">
-                  <svg className="w-8 h-5" viewBox="0 0 48 28" fill="none">
-                    <circle cx="16" cy="14" r="8" fill="#D4A84B" opacity="0.6"/>
-                    <circle cx="26" cy="14" r="8" fill="#D4A84B" opacity="0.4"/>
+                <div className="w-20 h-14 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-16 h-10" viewBox="0 0 48 28" fill="none">
+                    <text x="4" y="18" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="10" fill="#D4A84B">Union</text>
                   </svg>
                 </div>
-                {/* Amex */}
-                <div className="w-10 h-7 bg-white/10 rounded flex items-center justify-center">
-                  <svg className="w-8 h-5" viewBox="0 0 48 28" fill="none">
-                    <text x="2" y="16" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="8" fill="#D4A84B">AMEX</text>
-                  </svg>
-                </div>
-                {/* PayPal */}
-                <div className="w-10 h-7 bg-white/10 rounded flex items-center justify-center">
-                  <svg className="w-8 h-5" viewBox="0 0 48 28" fill="none">
+                <div className="w-20 h-14 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-16 h-10" viewBox="0 0 48 28" fill="none">
                     <text x="3" y="17" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="9" fill="#D4A84B">PayPal</text>
                   </svg>
                 </div>
-                {/* Apple Pay */}
-                <div className="w-10 h-7 bg-white/10 rounded flex items-center justify-center">
-                  <svg className="w-8 h-5" viewBox="0 0 48 28" fill="none">
+                <div className="w-20 h-14 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-16 h-10" viewBox="0 0 48 28" fill="none">
                     <text x="1" y="16" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="8" fill="#D4A84B">Apple</text>
                   </svg>
                 </div>
-                {/* Google Pay */}
-                <div className="w-10 h-7 bg-white/10 rounded flex items-center justify-center">
-                  <svg className="w-8 h-5" viewBox="0 0 48 28" fill="none">
-                    <text x="1" y="16" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="8" fill="#D4A84B">G Pay</text>
+                <div className="w-20 h-14 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-16 h-10" viewBox="0 0 48 28" fill="none">
+                    <text x="2" y="17" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="9" fill="#D4A84B">Alipay</text>
+                  </svg>
+                </div>
+                <div className="w-20 h-14 bg-white/10 rounded flex items-center justify-center">
+                  <svg className="w-16 h-10" viewBox="0 0 48 28" fill="none">
+                    <text x="1" y="17" fontFamily="Arial,sans-serif" fontWeight="bold" fontSize="8" fill="#D4A84B">WePay</text>
                   </svg>
                 </div>
               </div>
@@ -212,12 +221,12 @@ export default function Footer() {
       <div className="border-t border-chinese-gold/10">
         <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-gray-500">
-            © 2024 禅意手作 Zen Craft Bracelets. All rights reserved.
+            {t('footer.allRights')}
           </p>
           <div className="flex gap-4 text-xs text-gray-500">
-            <Link href="#" className="hover:text-chinese-gold transition-colors">隐私政策</Link>
-            <Link href="#" className="hover:text-chinese-gold transition-colors">服务条款</Link>
-            <Link href="#" className="hover:text-chinese-gold transition-colors">退换政策</Link>
+            <Link href="#" className="hover:text-chinese-gold transition-colors">{t('footer.privacy')}</Link>
+            <Link href="#" className="hover:text-chinese-gold transition-colors">{t('footer.terms')}</Link>
+            <Link href="#" className="hover:text-chinese-gold transition-colors">{t('footer.returns')}</Link>
           </div>
         </div>
       </div>

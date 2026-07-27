@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function AboutForm() {
+  const { t } = useI18n()
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [status, setStatus] = useState('')
 
@@ -27,9 +29,9 @@ export default function AboutForm() {
   }
 
   const fields = [
-    { key: 'name', label: '姓名', type: 'text' },
-    { key: 'email', label: '邮箱', type: 'email' },
-    { key: 'subject', label: '主题', type: 'text' },
+    { key: 'name', label: t('about.formName'), type: 'text' },
+    { key: 'email', label: t('about.formEmail'), type: 'email' },
+    { key: 'subject', label: t('about.formSubject'), type: 'text' },
   ]
 
   return (
@@ -47,7 +49,7 @@ export default function AboutForm() {
         </div>
       ))}
       <div>
-        <label className="block text-sm text-gray-600 mb-1">留言</label>
+        <label className="block text-sm text-gray-600 mb-1">{t('about.formMessage')}</label>
         <textarea
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
@@ -57,10 +59,10 @@ export default function AboutForm() {
         />
       </div>
       <button type="submit" disabled={status === 'sending'} className="chinese-btn-primary w-full">
-        {status === 'sending' ? '发送中...' : '发送留言'}
+        {status === 'sending' ? t('about.formSending') : t('about.formSubmit')}
       </button>
-      {status === 'success' && <p className="text-green-600 text-sm">留言已发送，感谢您的联系！</p>}
-      {status === 'error' && <p className="text-red-600 text-sm">发送失败，请稍后重试。</p>}
+      {status === 'success' && <p className="text-green-600 text-sm">{t('about.formSuccess')}</p>}
+      {status === 'error' && <p className="text-red-600 text-sm">{t('about.formError')}</p>}
     </form>
   )
 }

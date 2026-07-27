@@ -1,9 +1,12 @@
 import Link from 'next/link'
 import prisma from '@/lib/prisma'
+import { getLocale, t } from '@/lib/i18n-server'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ForumPage() {
+  const locale = getLocale();
+  const tr = (key, p) => t(locale, key, p);
   const categories = await prisma.forumCategory.findMany({
     orderBy: { sortOrder: 'asc' },
     include: {
@@ -20,8 +23,8 @@ export default async function ForumPage() {
     <div className="cloud-bg min-h-screen">
       <section className="bg-chinese-ink py-12">
         <div className="max-w-5xl mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">用户论坛</h1>
-          <p className="text-gray-400">分享手串搭配、养护知识，与同好交流</p>
+          <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">{tr('forum.title')}</h1>
+          <p className="text-gray-400">{tr('forum.desc')}</p>
         </div>
       </section>
 
@@ -59,14 +62,14 @@ export default async function ForumPage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-4 text-xs text-gray-400 ml-4">
-                          <span>{post._count.comments} 回复</span>
-                          <span>{post.viewCount} 阅读</span>
+                          <span>{tr('forum.replies', { count: post._count.comments })}</span>
+                          <span>{tr('forum.views', { count: post.viewCount })}</span>
                         </div>
                       </Link>
                     ))
                   ) : (
                     <div className="px-6 py-8 text-center text-sm text-gray-400">
-                      暂无帖子，来发第一篇吧！
+                      {tr('forum.empty')}
                     </div>
                   )}
                 </div>
@@ -76,7 +79,7 @@ export default async function ForumPage() {
         )}
 
         <div className="text-center mt-10">
-          <Link href="/forum/new" className="chinese-btn-primary">发表新帖</Link>
+          <Link href="/forum/new" className="chinese-btn-primary">{tr('forum.newPost')}</Link>
         </div>
       </div>
     </div>

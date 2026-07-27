@@ -1,11 +1,14 @@
 import prisma from '@/lib/prisma'
 import ForumCommentForm from './CommentForm'
 import Link from 'next/link'
+import { getLocale, t } from '@/lib/i18n-server'
 
 export const dynamic = 'force-dynamic'
 
 export default async function ForumPostPage({ params }) {
   const { id } = await params
+  const locale = getLocale();
+  const tr = (key, p) => t(locale, key, p);
   const post = await prisma.forumPost.findUnique({
     where: { id: parseInt(id) },
     include: {
@@ -33,9 +36,9 @@ export default async function ForumPostPage({ params }) {
     <div className="cloud-bg min-h-screen">
       <div className="bg-white border-b border-chinese-gold/10">
         <div className="max-w-4xl mx-auto px-4 py-3 text-xs text-gray-400">
-          <Link href="/" className="hover:text-chinese-gold">首页</Link>
+          <Link href="/" className="hover:text-chinese-gold">{tr('nav.home')}</Link>
           <span className="mx-2">/</span>
-          <Link href="/forum" className="hover:text-chinese-gold">论坛</Link>
+          <Link href="/forum" className="hover:text-chinese-gold">{tr('forum.breadcrumbForum')}</Link>
           <span className="mx-2">/</span>
           <span className="text-chinese-ink">{post.title}</span>
         </div>
@@ -56,7 +59,7 @@ export default async function ForumPostPage({ params }) {
         </div>
 
         <div className="mb-8">
-          <h2 className="font-serif text-xl text-chinese-ink mb-4">回复 ({post.comments.length})</h2>
+          <h2 className="font-serif text-xl text-chinese-ink mb-4">{tr('forum.replyCount', { count: post.comments.length })}</h2>
           {post.comments.length > 0 ? (
             <div className="space-y-3">
               {post.comments.map((c) => (
@@ -70,7 +73,7 @@ export default async function ForumPostPage({ params }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400">暂无回复，来发表第一条回复吧！</p>
+            <p className="text-sm text-gray-400">{tr('forum.noReplies')}</p>
           )}
         </div>
 

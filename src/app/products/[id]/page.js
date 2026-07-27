@@ -6,15 +6,16 @@ import ReviewForm from './ReviewForm'
 import CustomerPhotos from './CustomerPhotos'
 import ReviewMedia from '@/components/product/ReviewMedia'
 import Link from 'next/link'
+import { getLocale, t } from '@/lib/i18n-server'
 
 export const dynamic = 'force-dynamic'
 
-const materialLabel = { WOOD: '木质', STONE: '石材', MIXED: '混合' }
-
 export async function generateMetadata({ params }) {
   const { id } = await params
+  const locale = getLocale()
+  const tr = (key, p) => t(locale, key, p)
   const product = await prisma.product.findUnique({ where: { id: parseInt(id) } })
-  if (!product) return { title: '产品未找到 — 禅意手作' }
+  if (!product) return { title: tr('product.notFound') + ' — 禅意手作' }
 
   const firstLine = product.description.split('\n')[0]
   const images = JSON.parse(product.images || '[]')
@@ -32,6 +33,9 @@ export async function generateMetadata({ params }) {
 
 export default async function ProductDetailPage({ params }) {
   const { id } = await params
+  const locale = getLocale()
+  const tr = (key, p) => t(locale, key, p)
+  const materialLabel = { WOOD: tr('product.materialWood'), STONE: tr('product.materialStone'), MIXED: tr('product.materialMixed') }
   const product = await prisma.product.findUnique({
     where: { id: parseInt(id) },
     include: {
@@ -45,8 +49,8 @@ export default async function ProductDetailPage({ params }) {
   if (!product) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-serif text-chinese-ink mb-4">产品未找到</h1>
-        <Link href="/products" className="chinese-btn-primary">返回产品列表</Link>
+        <h1 className="text-2xl font-serif text-chinese-ink mb-4">{tr('product.notFound')}</h1>
+        <Link href="/products" className="chinese-btn-primary">{tr('product.backToProducts')}</Link>
       </div>
     )
   }
@@ -76,8 +80,8 @@ export default async function ProductDetailPage({ params }) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: '首页', item: '/' },
-      { '@type': 'ListItem', position: 2, name: '产品', item: '/products' },
+      { '@type': 'ListItem', position: 1, name: tr('product.breadcrumbHome'), item: '/' },
+      { '@type': 'ListItem', position: 2, name: tr('product.breadcrumbProducts'), item: '/products' },
       { '@type': 'ListItem', position: 3, name: product.name },
     ],
   }
@@ -97,9 +101,9 @@ export default async function ProductDetailPage({ params }) {
       {/* Breadcrumb */}
       <div className="bg-white border-b border-chinese-gold/10">
         <div className="max-w-7xl mx-auto px-4 py-3 text-xs text-gray-400">
-          <Link href="/" className="hover:text-chinese-gold">首页</Link>
+          <Link href="/" className="hover:text-chinese-gold">{tr('product.breadcrumbHome')}</Link>
           <span className="mx-2">/</span>
-          <Link href="/products" className="hover:text-chinese-gold">产品</Link>
+          <Link href="/products" className="hover:text-chinese-gold">{tr('product.breadcrumbProducts')}</Link>
           <span className="mx-2">/</span>
           <span className="text-chinese-ink">{product.name}</span>
         </div>
@@ -118,7 +122,7 @@ export default async function ProductDetailPage({ params }) {
                 {materialLabel[product.material]}
               </span>
               <h1 className="text-3xl font-serif text-chinese-ink mt-1 mb-2">{product.name}</h1>
-              <p className="text-xs text-gray-400">SKU: {product.sku}</p>
+              <p className="text-xs text-gray-400">{tr('product.sku')}: {product.sku}</p>
             </div>
 
             <div className="text-3xl text-chinese-red font-medium mb-6">
@@ -129,28 +133,28 @@ export default async function ProductDetailPage({ params }) {
             <div className="flex items-center gap-3 mb-6">
               <StarRating rating={Math.round(parseFloat(avgRating))} />
               <span className="text-sm text-gray-500">
-                {avgRating} ({product.reviews.length} 条评价)
+                {tr('product.rating', { rating: avgRating, count: product.reviews.length })}
               </span>
             </div>
 
             {/* Specs */}
             <div className="grid grid-cols-2 gap-4 mb-8 p-4 bg-white border border-chinese-gold/10">
               <div>
-                <span className="text-xs text-gray-400 block">材质</span>
+                <span className="text-xs text-gray-400 block">{tr('product.material')}</span>
                 <span className="text-sm text-chinese-ink">{materialLabel[product.material]}</span>
               </div>
               <div>
-                <span className="text-xs text-gray-400 block">珠径</span>
+                <span className="text-xs text-gray-400 block">{tr('product.diameter')}</span>
                 <span className="text-sm text-chinese-ink">{product.diameter}mm</span>
               </div>
               <div>
-                <span className="text-xs text-gray-400 block">手围</span>
+                <span className="text-xs text-gray-400 block">{tr('product.length')}</span>
                 <span className="text-sm text-chinese-ink">{product.lengthCm}cm</span>
               </div>
               <div>
-                <span className="text-xs text-gray-400 block">库存</span>
+                <span className="text-xs text-gray-400 block">{tr('product.stock')}</span>
                 <span className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {product.stock > 0 ? `有货 (${product.stock})` : '缺货'}
+                  {product.stock > 0 ? tr('product.inStock', { count: product.stock }) : tr('product.outOfStock')}
                 </span>
               </div>
             </div>
@@ -162,7 +166,7 @@ export default async function ProductDetailPage({ params }) {
 
         {/* Description */}
         <div className="mt-16">
-          <h2 className="font-serif text-2xl text-chinese-ink mb-4">产品描述</h2>
+          <h2 className="font-serif text-2xl text-chinese-ink mb-4">{tr('product.description')}</h2>
           <div className="w-12 h-0.5 bg-chinese-gold mb-6" />
           <div className="prose max-w-none text-gray-600 leading-relaxed whitespace-pre-line">
             {product.description}
@@ -179,7 +183,7 @@ export default async function ProductDetailPage({ params }) {
         {/* Reviews */}
         <div className="mt-8">
           <h2 className="font-serif text-2xl text-chinese-ink mb-6">
-            用户评价 ({product.reviews.length})
+            {tr('product.reviews', { count: product.reviews.length })}
           </h2>
 
           {/* Review List */}
@@ -205,7 +209,7 @@ export default async function ProductDetailPage({ params }) {
               })}
             </div>
           ) : (
-            <p className="text-gray-400 text-sm mb-10">暂无评价，成为第一个评价的人吧！</p>
+            <p className="text-gray-400 text-sm mb-10">{tr('product.noReviews')}</p>
           )}
 
           {/* Review Form */}

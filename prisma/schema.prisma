@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -129,6 +129,9 @@ model Order {
   customerEmail String @default("")
   customerPhone String @default("")
   customerAddr  String @default("")
+
+  stripeSessionId      String?  @unique
+  stripePaymentIntentId String?
 
   user User? @relation(fields: [userId], references: [id])
 }

@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from 'react'
 import MediaViewer from '@/components/ui/MediaViewer'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function CustomerPhotos({ reviews }) {
+  const { t } = useI18n()
   const [viewerOpen, setViewerOpen] = useState(false)
   const [viewerIndex, setViewerIndex] = useState(0)
 
@@ -27,8 +29,8 @@ export default function CustomerPhotos({ reviews }) {
 
   return (
     <div className="mt-12">
-      <h2 className="font-serif text-2xl text-chinese-ink mb-2">客户晒图</h2>
-      <p className="text-sm text-gray-400 mb-6">共 {allMedia.length} 张客户实拍</p>
+      <h2 className="font-serif text-2xl text-chinese-ink mb-2">{t('customerPhotos.title')}</h2>
+      <p className="text-sm text-gray-400 mb-6">{t('customerPhotos.count', { count: allMedia.length })}</p>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
         {allMedia.map((item, i) => (
           <button
@@ -48,7 +50,7 @@ export default function CustomerPhotos({ reviews }) {
                 </span>
               </>
             ) : (
-              <img src={item.url} alt="客户晒图" className="w-full h-full object-cover" loading="lazy" />
+              <img src={item.url} alt={t('customerPhotos.title')} className="w-full h-full object-cover" loading="lazy" />
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent
                           opacity-0 group-hover:opacity-100 transition-opacity p-1">

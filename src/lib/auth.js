@@ -28,3 +28,7 @@ export function getAuthUser(request) {
   if (!token) return null
   return verifyToken(token)
 }
+
+export function getTokenFromCookies(request) {
+  return request.cookies?.get('token')?.value || null
+}

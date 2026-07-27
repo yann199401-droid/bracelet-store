@@ -1,10 +1,16 @@
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import ContentShell from '@/components/layout/ContentShell'
 import SplashScreen from '@/components/layout/SplashScreen'
+import BackToTop from '@/components/layout/BackToTop'
+import ContactWidget from '@/components/layout/ContactWidget'
 import { CartProvider } from '@/lib/CartContext'
 import { AuthProvider } from '@/lib/AuthContext'
 import { ToastProvider } from '@/lib/ToastContext'
+import { I18nProvider } from '@/lib/I18nContext'
+import { SidebarProvider } from '@/lib/SidebarContext'
+import { getLocale } from '@/lib/i18n-server'
 
 export const metadata = {
   title: {
@@ -41,21 +47,31 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }) {
+  const locale = getLocale()
+
   return (
-    <html lang="zh-CN">
-      <body className="min-h-screen flex flex-col">
+    <html lang={locale === 'en' ? 'en' : 'zh-CN'}>
+      <body className="min-h-screen bg-chinese-ink text-gray-200">
         <SplashScreen />
-        <ToastProvider>
-          <AuthProvider>
-            <CartProvider>
-              <Navbar />
-              <main className="flex-1 animate-fadeIn">
-                {children}
-              </main>
-              <Footer />
-            </CartProvider>
-          </AuthProvider>
-        </ToastProvider>
+        <I18nProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <CartProvider>
+                <SidebarProvider>
+                  <Navbar />
+                  <ContentShell>
+                    <main className="flex-1 animate-fadeIn">
+                      {children}
+                    </main>
+                    <Footer />
+                  </ContentShell>
+                  <BackToTop />
+                  <ContactWidget />
+                </SidebarProvider>
+              </CartProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </I18nProvider>
       </body>
     </html>
   )

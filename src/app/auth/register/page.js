@@ -2,8 +2,10 @@
 
 import { Suspense } from 'react'
 import RegisterForm from './RegisterForm'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function RegisterPage() {
+  const { t } = useI18n()
   return (
     <Suspense fallback={
       <div className="min-h-[60vh] flex items-center justify-center cloud-bg py-20">

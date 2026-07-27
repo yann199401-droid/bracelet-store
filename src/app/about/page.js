@@ -1,6 +1,9 @@
 import AboutForm from './ContactForm'
+import { getLocale, t } from '@/lib/i18n-server'
 
 export default function AboutPage() {
+  const locale = getLocale();
+  const tr = (key, p) => t(locale, key, p);
   return (
     <div className="cloud-bg">
       {/* Hero */}
@@ -8,13 +11,13 @@ export default function AboutPage() {
         <div className="lattice-pattern absolute inset-0 opacity-10" />
         <div className="max-w-4xl mx-auto px-4 text-center relative">
           <div className="inline-block border border-chinese-gold/50 px-4 py-1 mb-6">
-            <span className="text-chinese-gold text-xs tracking-[0.3em]">About Us</span>
+            <span className="text-chinese-gold text-xs tracking-[0.3em]">{tr('about.title')}</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-serif text-white mb-6">
-            关于<span className="text-chinese-gold">禅意手作</span>
+            {tr('about.title')}
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            每一颗珠子，都是来自大自然的馈赠。我们用匠人之心，将它们串成值得珍藏的手作。
+            {tr('about.desc')}
           </p>
         </div>
       </section>
@@ -33,7 +36,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div>
-            <h2 className="font-serif text-3xl text-chinese-ink mb-6">品牌故事</h2>
+            <h2 className="font-serif text-3xl text-chinese-ink mb-6">{tr('about.brand')}</h2>
             <div className="w-16 h-0.5 bg-chinese-gold mb-6" />
             <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>
@@ -55,13 +58,13 @@ export default function AboutPage() {
       {/* Process */}
       <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="chinese-section-title">制作工艺</h2>
+          <h2 className="chinese-section-title">{tr('about.craft')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {[
-              { step: '01', title: '选材', desc: '精选优质天然木材与石材，严格筛选每一块原材料' },
-              { step: '02', title: '切割', desc: '依照纹理精细切割，最大程度保留材质的天然美感' },
-              { step: '03', title: '打磨', desc: '多道手工打磨工序，确保每一颗珠子圆润光滑' },
-              { step: '04', title: '串制', desc: '匠心串制，精心搭配，成就值得珍藏的手作精品' },
+              { step: '01', title: tr('about.craft1'), desc: '精选优质天然木材与石材，严格筛选每一块原材料' },
+              { step: '02', title: tr('about.craft2'), desc: '依照纹理精细切割，最大程度保留材质的天然美感' },
+              { step: '03', title: tr('about.craft3'), desc: '多道手工打磨工序，确保每一颗珠子圆润光滑' },
+              { step: '04', title: tr('about.craft4'), desc: '匠心串制，精心搭配，成就值得珍藏的手作精品' },
             ].map((item) => (
               <div key={item.step} className="text-center p-6">
                 <div className="w-16 h-16 border-2 border-chinese-gold flex items-center justify-center mx-auto mb-4">
@@ -79,7 +82,7 @@ export default function AboutPage() {
       <section className="max-w-7xl mx-auto px-4 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           <div>
-            <h2 className="font-serif text-3xl text-chinese-ink mb-6">联系我们</h2>
+            <h2 className="font-serif text-3xl text-chinese-ink mb-6">{tr('about.contactForm')}</h2>
             <div className="w-16 h-0.5 bg-chinese-gold mb-6" />
             <div className="space-y-4 text-gray-600">
               <p>有任何问题或合作意向，欢迎随时联系我们。</p>

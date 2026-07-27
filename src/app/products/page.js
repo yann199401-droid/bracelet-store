@@ -2,6 +2,7 @@ import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import ProductGrid from '@/components/product/ProductGrid'
 import Pagination from '@/components/ui/Pagination'
+import { getLocale, t } from '@/lib/i18n-server'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,6 +10,26 @@ export async function generateMetadata({ searchParams }) {
   const params = await searchParams
   const material = params.material || ''
   const search = params.search || ''
+  const locale = getLocale()
+
+  if (locale === 'en') {
+    let title = 'All Products — Zen Craft Bracelets'
+    let description = 'Browse all natural wood and stone bracelets, handcrafted with premium materials.'
+    if (material === 'WOOD') {
+      title = 'Wood Bracelets — Zen Craft Bracelets'
+      description = 'Premium rosewood, huanghuali, and agarwood bracelets, hand-polished with rich grain.'
+    } else if (material === 'STONE') {
+      title = 'Stone Bracelets — Jade, Agate, Jadeite | Zen Craft Bracelets'
+      description = 'Premium Hetian jade, agate, and jadeite bracelets, smooth and vibrant.'
+    } else if (material === 'MIXED') {
+      title = 'Mixed Material Bracelets — Zen Craft Bracelets'
+      description = 'Creative wood-and-stone mixed bracelets, unique and stylish.'
+    }
+    if (search) {
+      title = `Search "${search}" — ${title}`
+    }
+    return { title, description }
+  }
 
   let title = '所有产品 — 禅意手作 | Zen Craft Bracelets'
   let description = '浏览全部天然木石手串产品，包括小叶紫檀、黄花梨、和田玉、玛瑙、翡翠等材质，手工打磨，品质保证。'
@@ -34,25 +55,27 @@ export async function generateMetadata({ searchParams }) {
 
 const ITEMS_PER_PAGE = 12
 
-const materials = [
-  { value: '', label: '全部材质' },
-  { value: 'WOOD', label: '木质' },
-  { value: 'STONE', label: '石材' },
-  { value: 'MIXED', label: '混合' },
-]
-
-const sortOptions = [
-  { value: 'newest', label: '最新上架' },
-  { value: 'price-asc', label: '价格从低到高' },
-  { value: 'price-desc', label: '价格从高到低' },
-]
-
 export default async function ProductsPage({ searchParams }) {
   const params = await searchParams
   const page = parseInt(params.page) || 1
   const material = params.material || ''
   const sort = params.sort || 'newest'
   const search = params.search || ''
+  const locale = getLocale()
+  const tr = (key, p) => t(locale, key, p)
+
+  const materials = [
+    { value: '', label: tr('products.filterAll') },
+    { value: 'WOOD', label: tr('products.filterWood') },
+    { value: 'STONE', label: tr('products.filterStone') },
+    { value: 'MIXED', label: tr('products.filterMixed') },
+  ]
+
+  const sortOptions = [
+    { value: 'newest', label: tr('products.sortNewest') },
+    { value: 'price-asc', label: tr('products.sortPriceLow') },
+    { value: 'price-desc', label: tr('products.sortPriceHigh') },
+  ]
 
   const where = {}
   if (material) where.material = material
@@ -79,9 +102,9 @@ export default async function ProductsPage({ searchParams }) {
       {/* Header */}
       <section className="bg-chinese-ink py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">所有产品</h1>
+          <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">{tr('products.title')}</h1>
           {search && (
-            <p className="text-gray-400">搜索 &ldquo;{search}&rdquo; 的结果 ({total} 件)</p>
+            <p className="text-gray-400">{tr('products.searchEmpty', { query: search })} ({total})</p>
           )}
         </div>
       </section>
@@ -92,7 +115,7 @@ export default async function ProductsPage({ searchParams }) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Material Filter */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1 tracking-wider">材质</label>
+              <label className="block text-xs text-gray-500 mb-1 tracking-wider">{tr('product.material')}</label>
               <div className="flex flex-wrap gap-2">
                 {materials.map((m) => (
                   <Link
@@ -112,7 +135,7 @@ export default async function ProductsPage({ searchParams }) {
 
             {/* Sort */}
             <div>
-              <label className="block text-xs text-gray-500 mb-1 tracking-wider">排序</label>
+              <label className="block text-xs text-gray-500 mb-1 tracking-wider">{tr('products.sort')}</label>
               <div className="flex flex-wrap gap-2">
                 {sortOptions.map((s) => (
                   <Link
@@ -130,9 +153,9 @@ export default async function ProductsPage({ searchParams }) {
               </div>
             </div>
 
-            {/* Search Info */}
+            {/* Count */}
             <div className="flex items-end justify-end">
-              <span className="text-xs text-gray-400">共 {total} 件产品</span>
+              <span className="text-xs text-gray-400">{tr('products.count', { count: total })}</span>
             </div>
           </div>
         </div>
@@ -151,13 +174,15 @@ export default async function ProductsPage({ searchParams }) {
               </svg>
             </div>
             <p className="text-lg font-serif text-chinese-ink mb-2">
-              {search ? `未找到与"${search}"相关的产品` : '暂无产品'}
+              {search ? tr('products.searchEmpty', { query: search }) : tr('products.empty')}
             </p>
             <p className="text-sm text-gray-500 mb-6">
-              {search ? '试试其他关键词，或浏览所有产品' : '敬请期待更多手串上架'}
+              {search
+                ? (locale === 'en' ? 'Try different keywords or browse all products' : '试试其他关键词，或浏览所有产品')
+                : (locale === 'en' ? 'Check back soon for new arrivals' : '敬请期待更多手串上架')}
             </p>
             {search && (
-              <Link href="/products" className="chinese-btn-primary">浏览全部产品</Link>
+              <Link href="/products" className="chinese-btn-primary">{tr('products.browseAll')}</Link>
             )}
           </div>
         )}

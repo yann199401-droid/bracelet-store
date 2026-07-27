@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
 import { useToast } from '@/lib/ToastContext'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
   const toast = useToast()
+  const { t } = useI18n()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,12 +35,12 @@ export default function LoginPage() {
       <div className="w-full max-w-md mx-auto px-4">
         <div className="chinese-card p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-serif text-chinese-ink mb-2">登录</h1>
-            <p className="text-sm text-gray-500">欢迎回到禅意手作</p>
+            <h1 className="text-2xl font-serif text-chinese-ink mb-2">{t('auth.login')}</h1>
+            <p className="text-sm text-gray-500">{t('auth.welcome')}</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">邮箱</label>
+              <label className="block text-sm text-gray-600 mb-1">{t('auth.email')}</label>
               <input
                 type="email"
                 value={form.email}
@@ -49,7 +51,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">密码</label>
+              <label className="block text-sm text-gray-600 mb-1">{t('auth.password')}</label>
               <input
                 type="password"
                 value={form.password}
@@ -65,7 +67,7 @@ export default function LoginPage() {
             </button>
           </form>
           <p className="text-center text-sm text-gray-500 mt-6">
-            还没有账号？{' '}
+            {t('auth.noAccount')}{' '}
             <Link href="/auth/register" className="text-chinese-red hover:text-chinese-red-light">立即注册</Link>
           </p>
         </div>

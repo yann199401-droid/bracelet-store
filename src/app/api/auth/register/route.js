@@ -30,14 +30,14 @@ export async function POST(request) {
           const referralCount = await prisma.referral.count({ where: { referrerId } })
           if (referralCount >= 3) {
             const existingCoupon = await prisma.coupon.findFirst({
-              where: { userId: referrerId, code: { startsWith: 'ZEN50-' } },
+              where: { userId: referrerId, code: { startsWith: 'ZEN35-' } },
             })
             if (!existingCoupon) {
-              const code = `ZEN50-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+              const code = `ZEN35-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
               await prisma.coupon.create({
                 data: {
                   code,
-                  discount: 50,
+                  discount: 35,
                   minAmount: 80,
                   userId: referrerId,
                   expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days

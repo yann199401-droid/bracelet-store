@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/lib/AuthContext'
+import { useI18n } from '@/lib/I18nContext'
 
 export default function RegisterForm() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false)
 
   const ref = searchParams.get('ref')
+  const { t } = useI18n()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,7 +33,7 @@ export default function RegisterForm() {
     if (ok) {
       router.push('/auth/login')
     } else {
-      setError(error || '注册失败')
+      setError(error || t('auth.registerError'))
     }
     setLoading(false)
   }
@@ -41,15 +43,15 @@ export default function RegisterForm() {
       <div className="w-full max-w-md mx-auto px-4">
         <div className="chinese-card p-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-serif text-chinese-ink mb-2">注册</h1>
-            <p className="text-sm text-gray-500">加入禅意手作社区</p>
+            <h1 className="text-2xl font-serif text-chinese-ink mb-2">{t('auth.register')}</h1>
+            <p className="text-sm text-gray-500">{t('auth.join')}</p>
             {ref && (
               <p className="text-xs text-chinese-gold mt-2">通过好友推荐链接注册</p>
             )}
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">昵称</label>
+              <label className="block text-sm text-gray-600 mb-1">{t('auth.name')}</label>
               <input
                 type="text"
                 value={form.name}
@@ -60,7 +62,7 @@ export default function RegisterForm() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">邮箱</label>
+              <label className="block text-sm text-gray-600 mb-1">{t('auth.email')}</label>
               <input
                 type="email"
                 value={form.email}
@@ -71,7 +73,7 @@ export default function RegisterForm() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">密码</label>
+              <label className="block text-sm text-gray-600 mb-1">{t('auth.password')}</label>
               <input
                 type="password"
                 value={form.password}
@@ -83,7 +85,7 @@ export default function RegisterForm() {
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">确认密码</label>
+              <label className="block text-sm text-gray-600 mb-1">{t('auth.confirmPassword')}</label>
               <input
                 type="password"
                 value={form.confirmPassword}
@@ -95,11 +97,11 @@ export default function RegisterForm() {
             </div>
             {error && <p className="text-red-600 text-sm">{error}</p>}
             <button type="submit" disabled={loading} className="chinese-btn-primary w-full">
-              {loading ? '注册中...' : '注册'}
+              {loading ? '注册中...' : t('auth.register')}
             </button>
           </form>
           <p className="text-center text-sm text-gray-500 mt-6">
-            已有账号？{' '}
+            {t('auth.hasAccount')}{' '}
             <Link href="/auth/login" className="text-chinese-red hover:text-chinese-red-light">立即登录</Link>
           </p>
         </div>
