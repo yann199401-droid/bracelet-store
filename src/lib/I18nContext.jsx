@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import zh from '@/i18n/zh.json'
 import en from '@/i18n/en.json'
 
@@ -21,6 +22,7 @@ const I18nContext = createContext(null)
 
 export function I18nProvider({ children }) {
   const [locale, setLocaleState] = useState('zh')
+  const router = useRouter()
 
   // Initialize from cookie on mount
   useEffect(() => {
@@ -33,7 +35,8 @@ export function I18nProvider({ children }) {
   const setLocale = useCallback((newLocale) => {
     setLocaleState(newLocale)
     setCookie(COOKIE_NAME, newLocale)
-  }, [])
+    router.refresh()
+  }, [router])
 
   const toggleLocale = useCallback(() => {
     setLocale(locale === 'zh' ? 'en' : 'zh')
