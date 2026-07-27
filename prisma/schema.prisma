@@ -130,6 +130,9 @@ model Order {
   customerPhone String @default("")
   customerAddr  String @default("")
 
+  trackingNumber       String?
+  carrier              String?
+
   stripeSessionId      String?  @unique
   stripePaymentIntentId String?
 

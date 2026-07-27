@@ -13,7 +13,7 @@ export async function POST(request) {
       return NextResponse.json({ error: '邮箱或密码错误' }, { status: 401 })
     }
     const token = generateToken(user)
-    const response = NextResponse.json({ id: user.id, name: user.name, email: user.email })
+    const response = NextResponse.json({ id: user.id, name: user.name, email: user.email, role: user.role })
     response.cookies.set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

@@ -177,6 +177,15 @@ export default function Navbar() {
                         <div className="px-3 py-1.5 border-b border-gray-100">
                           <p className="text-[11px] text-gray-500 truncate">{user.email}</p>
                         </div>
+                        {user.role === 'ADMIN' && (
+                          <Link
+                            href="/admin"
+                            className="block px-3 py-1.5 text-xs text-chinese-red hover:bg-chinese-ivory transition-colors"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            ⚙ 管理后台
+                          </Link>
+                        )}
                         <button
                           onClick={handleLogout}
                           className="w-full text-left px-3 py-1.5 text-xs text-gray-600 hover:bg-chinese-ivory transition-colors cursor-pointer"
