@@ -1,12 +1,24 @@
-const BREVO_API = 'https://api.brevo.com/v3/smtp/email'
+let transporter = null
 
-function getBrevoKey() {
-  const key = process.env.BREVO_API_KEY
-  if (!key) {
-    console.warn('BREVO_API_KEY environment variable is not set — emails will not be sent')
-    return null
+function getTransporter() {
+  if (!transporter) {
+    const host = process.env.SMTP_HOST
+    if (!host) {
+      console.warn('SMTP_HOST environment variable is not set — emails will not be sent')
+      return null
+    }
+    const nodemailer = require('nodemailer')
+    transporter = nodemailer.createTransport({
+      host,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
   }
-  return key
+  return transporter
 }
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'Zen Craft Bracelets <noreply@myzenbeads.com>'
@@ -145,37 +157,20 @@ function escapeHtml(text) {
 /**
  * Send an order confirmation email
  */
-async function sendViaBrevo({ to, subject, html }) {
-  const key = getBrevoKey()
-  if (!key) {
-    console.log(`[Email] Would send "${subject}" to ${to} (no API key configured)`)
-    return { sent: false, reason: 'no_api_key' }
+async function sendViaSMTP({ to, subject, html }) {
+  const transport = getTransporter()
+  if (!transport) {
+    console.log(`[Email] Would send "${subject}" to ${to} (SMTP not configured)`)
+    return { sent: false, reason: 'no_smtp_config' }
   }
 
-  // Parse FROM_EMAIL: "Name <email>" or just "email"
-  const match = FROM_EMAIL.match(/^(.+)\s+<([^>]+)>$/)
-  const sender = match ? { name: match[1].trim(), email: match[2].trim() } : { email: FROM_EMAIL }
-
   try {
-    const res = await fetch(BREVO_API, {
-      method: 'POST',
-      headers: {
-        'api-key': key,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sender,
-        to: [{ email: to }],
-        subject,
-        htmlContent: html,
-      }),
+    await transport.sendMail({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
     })
-
-    if (!res.ok) {
-      const err = await res.text()
-      throw new Error(`Brevo API ${res.status}: ${err}`)
-    }
-
     console.log(`[Email] Sent "${subject}" to ${to}`)
     return { sent: true }
   } catch (error) {
@@ -190,7 +185,7 @@ export async function sendOrderConfirmation({ orderId, customerEmail, customerNa
     ? `[禅意手作] 订单 #${orderId} 已确认 — 感谢您的购买！`
     : `[Zen Craft Bracelets] Order #${orderId} Confirmed — Thank You!`
 
-  return sendViaBrevo({
+  return sendViaSMTP({
     to: customerEmail,
     subject,
     html: buildOrderConfirmationHtml({
@@ -227,7 +222,7 @@ export async function sendShippingNotification({ orderId, customerEmail, custome
     ? '— 禅意手作 Zen Craft Bracelets 团队'
     : '— The Zen Craft Bracelets Team'
 
-  return sendViaBrevo({
+  return sendViaSMTP({
     to: customerEmail,
     subject,
     html: `
