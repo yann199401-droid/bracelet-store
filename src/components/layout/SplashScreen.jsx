@@ -1,16 +1,55 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+
+function playWaterDrop() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+
+    // ── Main drop: high-to-low frequency sweep ──
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(1400, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.12)
+    gain.gain.setValueAtTime(0.25, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45)
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.45)
+
+    // ── Body resonance: the "plink" after the initial hit ──
+    const osc2 = ctx.createOscillator()
+    const gain2 = ctx.createGain()
+    osc2.type = 'sine'
+    osc2.frequency.setValueAtTime(520, ctx.currentTime + 0.04)
+    osc2.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.28)
+    gain2.gain.setValueAtTime(0.08, ctx.currentTime + 0.04)
+    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.50)
+    osc2.connect(gain2)
+    gain2.connect(ctx.destination)
+    osc2.start(ctx.currentTime + 0.04)
+    osc2.stop(ctx.currentTime + 0.50)
+  } catch (e) {
+    // 浏览器不支持或不允许音频，静默降级
+  }
+}
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(true)
   const [fadeOut, setFadeOut] = useState(false)
+
+  const playDrop = useCallback(() => playWaterDrop(), [])
 
   useEffect(() => {
     if (sessionStorage.getItem('splashSeen')) {
       setVisible(false)
       return
     }
+
+    // 与动画同步：金色圆环浮现时触发滴水声
+    playDrop()
 
     const fadeTimer = setTimeout(() => {
       setFadeOut(true)
@@ -21,7 +60,7 @@ export default function SplashScreen() {
     }, 2600)
 
     return () => clearTimeout(fadeTimer)
-  }, [])
+  }, [playDrop])
 
   if (!visible) return null
 
