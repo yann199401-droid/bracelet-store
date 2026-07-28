@@ -35,7 +35,8 @@ export default function AdminLayout({ children }) {
   if (!user) return null
 
   const navItems = [
-    { href: '/admin', label: '概览', icon: '📊' },
+    { href: '/admin/analytics', label: '数据面板', icon: '📊' },
+    { href: '/admin', label: '概览', icon: '📋' },
     { href: '/admin/orders', label: '订单管理', icon: '📦' },
     { href: '/admin/inquiries', label: '询盘管理', icon: '✉️' },
     { href: '/admin/blog', label: '博客管理', icon: '📝' },
