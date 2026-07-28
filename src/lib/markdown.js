@@ -2,6 +2,15 @@
  * Simple Markdown to HTML renderer (no external dependencies)
  */
 
+function sanitizeUrl(url) {
+  if (!url) return ''
+  const lower = url.trim().toLowerCase()
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+    return ''
+  }
+  return url
+}
+
 export function renderMarkdown(md) {
   if (!md) return ''
 
@@ -25,11 +34,17 @@ export function renderMarkdown(md) {
   // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
 
-  // Images (before links)
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%">')
-
-  // Links
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+  // Strip javascript: etc from URLs before inserting
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+    const safe = sanitizeUrl(url)
+    if (!safe) return text // if sanitized away, just show text
+    return `<a href="${safe}" target="_blank" rel="noopener noreferrer">${text}</a>`
+  })
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => {
+    const safe = sanitizeUrl(url)
+    if (!safe) return ''
+    return `<img src="${safe}" alt="${alt}" style="max-width:100%">`
+  })
 
   // Bold and italic
   html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
@@ -47,21 +62,50 @@ export function renderMarkdown(md) {
   // Blockquotes
   html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>')
 
-  // Unordered lists
-  html = html.replace(/^[\s]*[-*+]\s+(.+)$/gm, '<li>$1</li>')
-  html = html.replace(/(<li>.*<\/li>)/s, (match) => {
-    // Wrap consecutive <li> in <ul>
-    return match
-  })
+  // Lists — process line by line to build proper list groups
+  const lines = html.split('\n')
+  let result = []
+  let inList = false
+  let listType = null // 'ul' or 'ol'
 
-  // Ordered lists
-  html = html.replace(/^[\s]*\d+\.\s+(.+)$/gm, '<li>$1</li>')
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
 
-  // Wrap consecutive list items
-  html = html.replace(/((?:<li>.*?<\/li>\n?)+)/g, (match) => {
-    if (match.trim()) return `<ul>${match.trim()}</ul>`
-    return match
-  })
+    // Unordered list item
+    const ulMatch = line.match(/^[\s]*[-*+]\s+(.+)$/)
+    // Ordered list item
+    const olMatch = line.match(/^[\s]*\d+\.\s+(.+)$/)
+
+    if (ulMatch || olMatch) {
+      const content = ulMatch ? ulMatch[1] : olMatch[1]
+      const type = ulMatch ? 'ul' : 'ol'
+
+      if (!inList) {
+        listType = type
+        result.push(`<${type}>`)
+        inList = true
+      } else if (listType !== type) {
+        // Switching list types
+        result.push(`</${listType}><${type}>`)
+        listType = type
+      }
+
+      result.push(`<li>${content}</li>`)
+    } else {
+      if (inList) {
+        result.push(`</${listType}>`)
+        inList = false
+        listType = null
+      }
+      result.push(line)
+    }
+  }
+
+  if (inList) {
+    result.push(`</${listType}>`)
+  }
+
+  html = result.join('\n')
 
   // Clean up nested blockquotes (simple approach)
   html = html.replace(/<\/blockquote>\n?<blockquote>/g, '<br>')
@@ -69,14 +113,14 @@ export function renderMarkdown(md) {
   // Paragraphs (anything not wrapped in block-level tags)
   const blockTags = /^<\/?(h[1-6]|ul|ol|li|pre|blockquote|hr|div|table)/
 
-  const lines = html.split('\n')
-  const result = []
+  const paraLines = html.split('\n')
+  result = []
   let inParagraph = false
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim()
+  for (let i = 0; i < paraLines.length; i++) {
+    const pl = paraLines[i].trim()
 
-    if (!line) {
+    if (!pl) {
       if (inParagraph) {
         result.push('</p>')
         inParagraph = false
@@ -84,12 +128,12 @@ export function renderMarkdown(md) {
       continue
     }
 
-    if (blockTags.test(line)) {
+    if (blockTags.test(pl)) {
       if (inParagraph) {
         result.push('</p>')
         inParagraph = false
       }
-      result.push(line)
+      result.push(pl)
     } else {
       if (!inParagraph) {
         result.push('<p>')
@@ -97,7 +141,7 @@ export function renderMarkdown(md) {
       } else {
         result.push('<br>')
       }
-      result.push(line)
+      result.push(pl)
     }
   }
 

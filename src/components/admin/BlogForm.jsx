@@ -95,7 +95,7 @@ export default function BlogForm({ initialData }) {
             if (!isEdit && !form.slugManuallyEdited) {
               const slug = e.target.value.toLowerCase()
                 .replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-')
-                .replace(/^-+|-+$/g, '')
+                .replace(/^-+|-+$/g, '').replace(/-+/g, '-')
               setForm(prev => ({ ...prev, title: e.target.value, slug }))
             }
           }} required className={inputClass} placeholder="文章标题" />
