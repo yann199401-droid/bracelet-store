@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
   const locale = getLocale()
   const tr = (key, p) => t(locale, key, p)
   const product = await prisma.product.findUnique({ where: { id: parseInt(id) } })
-  if (!product) return { title: tr('product.notFound') + ' — 禅意手作' }
+  if (!product || !product.active) return { title: tr('product.notFound') + ' — 禅意手作' }
 
   const firstLine = product.description.split('\n')[0]
   const images = JSON.parse(product.images || '[]')
@@ -37,7 +37,7 @@ export default async function ProductDetailPage({ params }) {
   const tr = (key, p) => t(locale, key, p)
   const materialLabel = { WOOD: tr('product.materialWood'), STONE: tr('product.materialStone'), MIXED: tr('product.materialMixed') }
   const product = await prisma.product.findUnique({
-    where: { id: parseInt(id) },
+    where: { id: parseInt(id), active: true },
     include: {
       reviews: {
         include: { user: true },

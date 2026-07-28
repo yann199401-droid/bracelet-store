@@ -77,7 +77,7 @@ export default async function ProductsPage({ searchParams }) {
     { value: 'price-desc', label: tr('products.sortPriceHigh') },
   ]
 
-  const where = {}
+  const where = { active: true }
   if (material) where.material = material
   if (search) where.name = { contains: search }
 

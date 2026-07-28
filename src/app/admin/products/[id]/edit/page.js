@@ -1,0 +1,50 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import Link from 'next/link'
+import ProductForm from '@/components/admin/ProductForm'
+
+export default function EditProductPage() {
+  const { id } = useParams()
+  const [product, setProduct] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    fetch(`/api/admin/products/${id}`)
+      .then(r => {
+        if (!r.ok) throw new Error('产品不存在')
+        return r.json()
+      })
+      .then(data => setProduct(data))
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) {
+    return <p className="text-gray-500">加载中...</p>
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 mb-4">{error}</p>
+        <Link href="/admin/products" className="text-chinese-red hover:underline text-sm">
+          ← 返回产品列表
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <Link href="/admin/products" className="text-gray-500 hover:text-gray-800 text-sm mb-4 inline-block">
+        ← 返回产品列表
+      </Link>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">编辑产品：{product.name}</h1>
+      <ProductForm initialData={product} />
+    </div>
+  )
+}

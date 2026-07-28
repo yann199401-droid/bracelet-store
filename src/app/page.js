@@ -21,12 +21,13 @@ export default async function HomePage() {
   const tr = (key, params) => t(locale, key, params)
 
   const featuredProducts = await prisma.product.findMany({
-    where: { featured: true },
+    where: { featured: true, active: true },
     take: 8,
     orderBy: { createdAt: 'desc' },
   })
 
   const recentProducts = await prisma.product.findMany({
+    where: { active: true },
     take: 8,
     orderBy: { createdAt: 'desc' },
   })
