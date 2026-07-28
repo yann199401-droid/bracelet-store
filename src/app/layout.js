@@ -5,6 +5,7 @@ import ContentShell from '@/components/layout/ContentShell'
 import SplashScreen from '@/components/layout/SplashScreen'
 import BackToTop from '@/components/layout/BackToTop'
 import ContactWidget from '@/components/layout/ContactWidget'
+import SiteGuard from '@/components/layout/SiteGuard'
 import { CartProvider } from '@/lib/CartContext'
 import { AuthProvider } from '@/lib/AuthContext'
 import { ToastProvider } from '@/lib/ToastContext'
@@ -60,13 +61,15 @@ export default function RootLayout({ children }) {
             <AuthProvider>
               <CartProvider>
                 <SidebarProvider>
-                  <Navbar />
-                  <ContentShell>
-                    <main className="flex-1 animate-fadeIn">
-                      {children}
-                    </main>
-                    <Footer />
-                  </ContentShell>
+                  <SiteGuard>
+                    <Navbar />
+                    <ContentShell>
+                      <main className="flex-1 animate-fadeIn">
+                        {children}
+                      </main>
+                      <Footer />
+                    </ContentShell>
+                  </SiteGuard>
                   <BackToTop />
                   <ContactWidget />
                 </SidebarProvider>

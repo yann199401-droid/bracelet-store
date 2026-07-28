@@ -42,6 +42,7 @@ export default function AdminLayout({ children }) {
     { href: '/admin/blog', label: '博客管理', icon: '📝' },
     { href: '/admin/products', label: '产品管理', icon: '💎' },
     { href: '/admin/media', label: '图片管理', icon: '🖼️' },
+    { href: '/admin/publish', label: '一键发布', icon: '🚀' },
   ]
 
   return (
