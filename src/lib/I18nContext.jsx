@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import zh from '@/i18n/zh.json'
 import en from '@/i18n/en.json'
@@ -8,29 +8,15 @@ import en from '@/i18n/en.json'
 const messages = { zh, en }
 const COOKIE_NAME = 'locale'
 
-function getCookie(name) {
-  if (typeof document === 'undefined') return null
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`))
-  return match ? decodeURIComponent(match[2]) : null
-}
-
 function setCookie(name, value) {
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`
 }
 
 const I18nContext = createContext(null)
 
-export function I18nProvider({ children }) {
-  const [locale, setLocaleState] = useState('zh')
+export function I18nProvider({ children, initialLocale = 'zh' }) {
+  const [locale, setLocaleState] = useState(initialLocale)
   const router = useRouter()
-
-  // Initialize from cookie on mount
-  useEffect(() => {
-    const saved = getCookie(COOKIE_NAME)
-    if (saved === 'en' || saved === 'zh') {
-      setLocaleState(saved)
-    }
-  }, [])
 
   const setLocale = useCallback((newLocale) => {
     setLocaleState(newLocale)

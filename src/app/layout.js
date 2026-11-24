@@ -54,7 +54,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang={locale === 'en' ? 'en' : 'zh-CN'}>
       <body className="min-h-screen bg-chinese-ink text-gray-200">
-        <I18nProvider>
+        <I18nProvider initialLocale={locale}>
           <ToastProvider>
             <AuthProvider>
               <CartProvider>
