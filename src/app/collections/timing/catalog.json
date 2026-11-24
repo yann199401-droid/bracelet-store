@@ -1,0 +1,142 @@
+[
+  {
+    "id": "light-brown-wood-mala",
+    "name": {
+      "zh": "浅棕木珠长串",
+      "en": "Light brown bead mala"
+    },
+    "material": {
+      "zh": "浅棕木纹圆珠，木种待确认",
+      "en": "Light brown beads with visible wood grain. Wood species pending confirmation."
+    },
+    "spec": "8 mm",
+    "stock": 300,
+    "image": "/images/collections/timing/light-brown-wood-mala-front.webp"
+  },
+  {
+    "id": "dark-brown-wood-mala",
+    "name": {
+      "zh": "深棕木珠长串",
+      "en": "Dark brown bead mala"
+    },
+    "material": {
+      "zh": "深棕木纹圆珠，木种待确认",
+      "en": "Dark brown beads with visible wood grain. Wood species pending confirmation."
+    },
+    "spec": "6 mm",
+    "stock": 300,
+    "image": "/images/collections/timing/dark-brown-wood-mala-front.webp"
+  },
+  {
+    "id": "black-bead-mala",
+    "name": {
+      "zh": "黑色珠长串",
+      "en": "Black bead mala"
+    },
+    "material": {
+      "zh": "黑色光泽圆珠，材质待确认",
+      "en": "Glossy black round beads. Material pending confirmation."
+    },
+    "spec": "",
+    "stock": 300,
+    "image": "/images/collections/timing/black-bead-mala-front.webp"
+  },
+  {
+    "id": "multicolor-bead-bracelet",
+    "name": {
+      "zh": "十八籽彩珠手串",
+      "en": "Multicolor eighteen-seed bracelet"
+    },
+    "material": {
+      "zh": "多色十八籽搭配，单颗珠材待确认",
+      "en": "A mix of brightly colored beads. Individual bead materials are pending confirmation."
+    },
+    "spec": "",
+    "stock": 300,
+    "image": "/images/collections/timing/multicolor-bead-bracelet-front.webp"
+  },
+  {
+    "id": "multicolor-bead-mala",
+    "name": {
+      "zh": "彩珠多圈串",
+      "en": "Multicolor wrap mala"
+    },
+    "material": {
+      "zh": "多色木纹珠和金属色配件，具体材质待确认",
+      "en": "Multicolor wood-grain beads and metallic-tone fittings. Exact materials are pending confirmation."
+    },
+    "spec": "",
+    "stock": 300,
+    "image": "/images/collections/timing/multicolor-bead-mala-front.webp"
+  },
+  {
+    "id": "red-sandalwood-bracelet-10mm",
+    "name": {
+      "zh": "紫檀普通款",
+      "en": "Gold-fleck sandalwood bracelet"
+    },
+    "material": {
+      "zh": "图片标注印度紫檀，深红圆珠有金星纹理",
+      "en": "Supplier imagery identifies Indian red sandalwood. Dark red beads show gold-fleck patterns."
+    },
+    "spec": "10 mm、19 颗",
+    "stock": 300,
+    "image": "/images/collections/timing/red-sandalwood-bracelet-10mm-front.webp"
+  },
+  {
+    "id": "red-sandalwood-tassel-10mm",
+    "name": {
+      "zh": "紫檀带流苏款",
+      "en": "Gold-fleck sandalwood with tassel"
+    },
+    "material": {
+      "zh": "图片标注印度紫檀，深红金星圆珠配同色流苏",
+      "en": "Supplier imagery identifies Indian red sandalwood. Dark red beads with a matching beaded tassel."
+    },
+    "spec": "10 mm、19 颗",
+    "stock": 300,
+    "image": "/images/collections/timing/red-sandalwood-tassel-10mm-front.webp"
+  },
+  {
+    "id": "orange-wood-mala",
+    "name": {
+      "zh": "橙色木珠长串",
+      "en": "Orange-brown bead mala"
+    },
+    "material": {
+      "zh": "橙棕木纹圆珠，木种待确认",
+      "en": "Orange-brown beads with visible grain. Wood species pending confirmation."
+    },
+    "spec": "",
+    "stock": 300,
+    "image": "/images/collections/timing/orange-wood-mala-front.webp"
+  },
+  {
+    "id": "green-bead-pendant-bracelet",
+    "name": {
+      "zh": "青绿色圆珠带吊坠款",
+      "en": "Green sandalwood bracelet with knot"
+    },
+    "material": {
+      "zh": "详情图标注绿檀，配葫芦形顶珠和绳结",
+      "en": "Supplier detail imagery identifies green sandalwood. A gourd-shaped bead sits above a knotted cord."
+    },
+    "spec": "",
+    "stock": 300,
+    "image": "/images/collections/timing/green-bead-pendant-bracelet-front.webp"
+  },
+  {
+    "id": "green-bead-mala",
+    "name": {
+      "zh": "青绿色圆珠长串",
+      "en": "Green bead mala"
+    },
+    "material": {
+      "zh": "青绿色木纹圆珠，系列图标注绿檀，单款材质待确认",
+      "en": "Green-toned beads with visible grain. The series is labeled green sandalwood. Material for this piece is pending confirmation."
+    },
+    "spec": "",
+    "stock": 300,
+    "image": "/images/collections/timing/green-bead-mala-front.webp"
+  }
+]

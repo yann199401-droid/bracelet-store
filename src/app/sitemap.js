@@ -45,6 +45,7 @@ export default async function sitemap() {
     { url: `${baseUrl}/forum`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
     { url: `${baseUrl}/auth/login`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
     { url: `${baseUrl}/auth/register`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
+    { url: `${baseUrl}/collections/timing` },
     ...productUrls,
     ...blogUrls,
   ]

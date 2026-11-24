@@ -77,6 +77,9 @@ export default async function HomePage() {
               {locale === 'en' ? tr('home.heroDesc') : '精选天然木材与珍稀石材，手工打磨每一颗珠粒。让大自然的温度，陪伴你的每一天。'}
             </p>
             <div className="flex flex-wrap gap-4">
+              <Link href="/collections/timing" className="chinese-btn-gold text-base px-8 py-3">
+                {locale === 'en' ? 'Preview the new collection' : '浏览「时间有迹」新品'}
+              </Link>
               <Link href="/products" className="chinese-btn-primary text-base px-8 py-3">
                 {tr('home.exploreBtn')}
               </Link>

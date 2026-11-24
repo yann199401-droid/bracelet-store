@@ -110,6 +110,9 @@ export default async function ProductsPage({ searchParams }) {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <Link href="/collections/timing" className="mb-6 inline-block text-sm text-chinese-red underline underline-offset-4">
+          {locale === 'en' ? 'Preview ten new designs' : '浏览「时间有迹」首批十款新品'}
+        </Link>
         {/* Filters */}
         <div className="bg-white p-4 chinese-border mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
