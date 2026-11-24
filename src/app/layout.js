@@ -2,7 +2,6 @@ import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import ContentShell from '@/components/layout/ContentShell'
-import SplashScreen from '@/components/layout/SplashScreen'
 import BackToTop from '@/components/layout/BackToTop'
 import ContactWidget from '@/components/layout/ContactWidget'
 import SiteGuard from '@/components/layout/SiteGuard'
@@ -13,7 +12,7 @@ import { I18nProvider } from '@/lib/I18nContext'
 import { SidebarProvider } from '@/lib/SidebarContext'
 import { getLocale } from '@/lib/i18n-server'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3457'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://myzenbeads.com'
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -21,12 +20,12 @@ export const metadata = {
     default: '禅意手作 | Zen Craft Bracelets — 天然木石手串',
     template: '%s | 禅意手作 Zen Craft Bracelets',
   },
-  description: '精选天然木材与珍稀石材，手工打造每一串手串。传承东方美学，匠心独具。面向东南亚及全球客户。',
+  description: '浏览禅意手作的木石手串，按日常、出发与赠礼选择款式，查阅材质、规格和手围。',
   keywords: ['手串', '木质手串', '石材手串', '禅意手作', 'Zen Craft Bracelets', '紫檀', '黄花梨', '和田玉', '玛瑙', '文玩', '天然木石手串'],
   authors: [{ name: '禅意手作 | Zen Craft Bracelets' }],
   openGraph: {
     title: '禅意手作 | Zen Craft Bracelets — 天然木石手串',
-    description: '精选天然木材与珍稀石材，手工打磨每一颗珠粒。让大自然的温度，陪伴你的每一天。',
+    description: '把重要的时光，留在腕间。浏览时间有迹系列和款式档案。',
     url: '/',
     siteName: '禅意手作',
     locale: 'zh_CN',
@@ -36,7 +35,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: '禅意手作 | Zen Craft Bracelets — 天然木石手串',
-    description: '精选天然木材与珍稀石材，手工打磨每一颗珠粒。',
+    description: '把重要的时光，留在腕间。',
     images: ['/images/banners/hero-bracelet.jpg'],
   },
   robots: {
@@ -55,7 +54,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang={locale === 'en' ? 'en' : 'zh-CN'}>
       <body className="min-h-screen bg-chinese-ink text-gray-200">
-        <SplashScreen />
         <I18nProvider>
           <ToastProvider>
             <AuthProvider>

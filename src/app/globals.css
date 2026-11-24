@@ -5,10 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
 
 :root {
-  --chinese-red: #B22222;
-  --chinese-gold: #D4A84B;
-  --chinese-ink: #1A1A2E;
-  --chinese-ivory: #F5F0E8;
+  --chinese-red: #805140;
+  --chinese-gold: #C5A46D;
+  --chinese-ink: #282820;
+  --chinese-ivory: #F7F3EC;
 }
 
 @layer base {
@@ -102,5 +102,39 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@layer components {
+  .timing-page {
+    @apply min-h-screen bg-[#f7f3ec] text-[#25231e];
+  }
+
+  .timing-shell {
+    @apply mx-auto max-w-6xl px-5;
+  }
+
+  .timing-kicker {
+    @apply text-sm font-medium text-[#555c43];
+  }
+
+  .timing-heading {
+    @apply mb-6 text-3xl leading-tight;
+  }
+
+  .timing-card {
+    @apply block overflow-hidden rounded-xl border border-stone-200 bg-white text-stone-900;
+  }
+
+  .timing-button {
+    @apply inline-flex items-center justify-center rounded-md border border-[#4b543e] bg-[#4b543e] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#3e4633] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4b543e];
+  }
+
+  .timing-button-secondary {
+    @apply bg-transparent text-[#414936] hover:bg-stone-100;
+  }
+
+  .timing-link {
+    @apply font-medium text-[#414936] underline underline-offset-4;
   }
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-export default function ProductImages({ images }) {
+export default function ProductImages({ images, productName }) {
   const parsedImages = typeof images === 'string' ? JSON.parse(images || '[]') : images
   const [selectedIndex, setSelectedIndex] = useState(0)
 
@@ -22,7 +22,7 @@ export default function ProductImages({ images }) {
       <div className="aspect-square bg-chinese-ivory-dark overflow-hidden border border-chinese-gold/20">
         <img
           src={parsedImages[selectedIndex]}
-          alt="产品图片"
+          alt={productName}
           loading="lazy"
           className="w-full h-full object-cover"
         />
@@ -34,13 +34,14 @@ export default function ProductImages({ images }) {
           {parsedImages.map((img, index) => (
             <button
               key={index}
+              aria-pressed={index === selectedIndex}
               onClick={() => setSelectedIndex(index)}
               className={`w-16 h-16 flex-shrink-0 border-2 transition-colors overflow-hidden
                 ${index === selectedIndex ? 'border-chinese-gold' : 'border-transparent hover:border-chinese-gold/50'}`}
             >
               <img
                 src={img}
-                alt={`产品图 ${index + 1}`}
+                alt={`${productName} · ${index + 1}`}
                 loading="lazy"
                 className="w-full h-full object-cover"
               />

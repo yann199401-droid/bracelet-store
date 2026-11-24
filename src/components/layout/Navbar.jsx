@@ -22,6 +22,12 @@ const navIcon = (href) => {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
       </svg>
     ),
+    '/collections/timing': (
+      <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8" strokeWidth={2} />
+        <path d="M12 8v4l3 2" strokeWidth={2} strokeLinecap="round" />
+      </svg>
+    ),
     '/promotions': (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
@@ -61,6 +67,7 @@ export default function Navbar() {
   const navItems = [
     { href: '/', label: t('nav.home') },
     { href: '/products', label: t('nav.products') },
+    { href: '/collections/timing', label: locale === 'en' ? 'Collection' : '时间有迹' },
     { href: '/promotions', label: t('nav.promotions') },
     { href: '/blog', label: t('nav.blog') },
     { href: '/about', label: t('nav.about') },
@@ -325,13 +332,13 @@ export default function Navbar() {
       {/* Mobile inline nav (hidden on desktop) */}
       {isOpen && (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-chinese-ink border-t border-chinese-gold/10 px-2 py-2">
-          <div className="flex justify-around">
+          <div className="flex justify-between gap-1 overflow-x-auto">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded transition-colors
+                className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 px-0.5 py-1 text-center rounded transition-colors
                   ${isActive(item.href) ? 'text-chinese-gold' : 'text-gray-400 hover:text-chinese-gold-light'}`}
               >
                 <span className="w-4 h-4">{navIcon(item.href)}</span>

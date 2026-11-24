@@ -23,6 +23,7 @@ export async function generateMetadata({ params }) {
   return {
     title: `${product.name} — 禅意手作`,
     description: firstLine.substring(0, 160),
+    alternates: { canonical: `/products/${product.id}` },
     openGraph: {
       title: `${product.name} — 禅意手作`,
       description: firstLine.substring(0, 160),
@@ -87,7 +88,7 @@ export default async function ProductDetailPage({ params }) {
   }
 
   return (
-    <div className="cloud-bg min-h-screen">
+    <div className="timing-page">
       {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
@@ -113,7 +114,7 @@ export default async function ProductDetailPage({ params }) {
         {/* Product Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Images */}
-          <ProductImages images={images} />
+          <ProductImages images={images} productName={product.name} />
 
           {/* Info */}
           <div>
@@ -161,6 +162,13 @@ export default async function ProductDetailPage({ params }) {
 
             {/* Buy Button */}
             <AddToCartButton product={product} />
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              <Link href={`/archive?code=${encodeURIComponent(product.sku)}`} className="timing-link">
+                {locale === 'en' ? 'Product archive' : '产品档案'}
+              </Link>
+              <Link href="/guide#size" className="timing-link">{locale === 'en' ? 'Wrist sizing' : '手围指南'}</Link>
+              <Link href="/guide#support" className="timing-link">{locale === 'en' ? 'Order support' : '购买与售后'}</Link>
+            </div>
           </div>
         </div>
 

@@ -7,52 +7,74 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata() {
   const locale = getLocale()
   return {
-    title: locale === 'en' ? 'Blog — Zen Craft Bracelets' : '博客 — 禅意手作 | Zen Craft Bracelets',
+    title: locale === 'en' ? 'Time in Detail Journal' : '时间有迹手记',
     description: locale === 'en'
-      ? 'Read about bracelet care, gemstone meanings, wood types, and Zen lifestyle tips.'
-      : '了解手串保养、宝石寓意、木料知识和禅意生活。',
+      ? 'Read about bead materials, bracelet care, and choosing a gift.'
+      : '阅读材质资料、手串养护与赠礼选款指南。',
   }
 }
 
 export default async function BlogPage({ searchParams }) {
   const params = await searchParams
-  const page = parseInt(params.page) || 1
+  const page = Math.max(1, parseInt(params.page, 10) || 1)
   const pageSize = 9
   const locale = getLocale()
 
-  const [posts, total] = await Promise.all([
-    prisma.blogPost.findMany({
-      where: { published: true },
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    }),
-    prisma.blogPost.count({ where: { published: true } }),
-  ])
+  const en = locale === 'en'
+  const topics = [
+    { title: en ? 'Where a bead comes from' : '一串的来历', href: '/archive',
+      text: en ? 'Read style records and their source notes.' : '查看款式规格和材质资料来源。' },
+    { title: en ? 'Care after wearing' : '佩戴与保养', href: '/guide',
+      text: en ? 'Measure your wrist and care for beads and cord.' : '量手围，养护珠子与绳线。' },
+    { title: en ? 'A gift for a moment' : '给某一刻的礼物', href: '/collections/timing?series=gifts',
+      text: en ? 'Browse designs selected for giving.' : '按赠礼和纪念场景选款。' },
+  ]
+  let posts = []
+  let total = 0
+  let unavailable = false
+  try {
+    [posts, total] = await Promise.all([
+      prisma.blogPost.findMany({
+        where: { published: true },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.blogPost.count({ where: { published: true } }),
+    ])
+  } catch (error) {
+    console.error('Journal posts could not be loaded', error)
+    unavailable = true
+  }
 
   const totalPages = Math.ceil(total / pageSize)
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-serif text-chinese-ink mb-2">
-        {locale === 'en' ? 'Blog' : '博客'}
-      </h1>
-      <p className="text-gray-500 mb-8">
-        {locale === 'en'
-          ? 'Bracelet care, gemstone meanings, and Zen lifestyle.'
-          : '手串保养、宝石寓意、禅意生活'}
-      </p>
+    <div className="timing-page">
+      <div className="timing-shell py-12">
+      <h1 className="timing-heading">{en ? 'Time in Detail Journal' : '时间有迹手记'}</h1>
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        {topics.map(({ title, href, text }) => (
+          <Link key={href} href={href} className="timing-card p-5">
+            <h2 className="text-lg">{title}</h2>
+            <p className="mt-2 text-sm text-stone-700">{text}</p>
+          </Link>
+        ))}
+      </div>
 
       {posts.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          {locale === 'en' ? 'No posts yet. Coming soon.' : '暂无文章，敬请期待。'}
+          {unavailable ? (en ? 'Articles are temporarily unavailable.' : '文章暂不可用。') : (en ? 'No articles yet.' : '暂无文章。')}
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map(post => {
               let tags = []
-              try { tags = JSON.parse(post.tags) } catch {}
+              try {
+                const parsed = JSON.parse(post.tags)
+                if (Array.isArray(parsed)) tags = parsed.filter((tag) => typeof tag === 'string')
+              } catch {}
               return (
                 <Link key={post.id} href={`/blog/${post.slug}`}
                   className="group bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden
@@ -104,6 +126,7 @@ export default async function BlogPage({ searchParams }) {
           )}
         </>
       )}
+      </div>
     </div>
   )
 }

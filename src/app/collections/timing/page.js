@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getLocale } from '@/lib/i18n-server'
 import catalog from './catalog.json'
 import WristSize from './WristSize'
+import { series } from '@/lib/timing'
 
 const path = '/collections/timing'
 
@@ -17,12 +18,14 @@ export function generateMetadata() {
   }
 }
 
-export default function TimingCollectionPage() {
+export default function TimingCollectionPage({ searchParams }) {
   const locale = getLocale()
   const english = locale === 'en'
+  const selected = series.find(({ id }) => id === searchParams?.series)
+  const items = selected ? catalog.filter(({ id }) => selected.designs.includes(id)) : catalog
 
   return (
-    <div className="min-h-screen bg-[#f7f3ec] text-stone-900">
+    <div className="timing-page">
       <header className="border-b border-stone-200 bg-[#eee5d7]">
         <div className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
           <Link href="/products" className="text-sm text-stone-700 underline underline-offset-4">
@@ -36,9 +39,23 @@ export default function TimingCollectionPage() {
         </div>
       </header>
       <div className="mx-auto max-w-6xl px-5 py-8 sm:py-12">
+        <nav aria-label={english ? 'Filter by occasion' : '按系列选款'} className="mb-6 flex flex-wrap gap-2">
+          <Link href={path} aria-current={!selected ? 'page' : undefined}
+            className={`timing-button ${selected ? 'timing-button-secondary' : ''}`}>
+            {english ? 'All designs' : '全部款式'}
+          </Link>
+          {series.map((item) => (
+            <Link key={item.id} href={`${path}?series=${item.id}`}
+              aria-current={selected?.id === item.id ? 'page' : undefined}
+              className={`timing-button ${selected?.id === item.id ? '' : 'timing-button-secondary'}`}>
+              {item.name[locale]}
+            </Link>
+          ))}
+        </nav>
+        {selected && <p className="mb-6 text-stone-700">{selected.story[locale]}</p>}
         <section aria-label={english ? 'New designs' : '新品款式'}
           className="grid grid-cols-1 gap-5 min-[390px]:grid-cols-2 lg:grid-cols-3">
-          {catalog.map((item) => (
+          {items.map((item) => (
             <article key={item.id} id={item.id} className="scroll-mt-24 overflow-hidden rounded-xl border border-stone-200 bg-white">
               <a href={item.image} aria-label={english ? `View ${item.name.en} image` : `查看${item.name.zh}大图`}>
                 <div className="relative aspect-square">
@@ -57,9 +74,9 @@ export default function TimingCollectionPage() {
                 )}
                 <p className="text-sm text-stone-700">{english ? `Stock: ${item.stock} pcs` : `库存 ${item.stock} 件`}</p>
                 <WristSize english={english} />
-                <a href={`#${item.id}`} className="inline-block text-sm text-stone-700 underline underline-offset-4">
-                  {english ? 'Link to this design' : '此款链接'}
-                </a>
+                <Link href={`/archive?code=${encodeURIComponent(item.id)}`} className="timing-link inline-block text-sm">
+                  {english ? 'View style record' : '查阅款式档案'}
+                </Link>
               </div>
             </article>
           ))}

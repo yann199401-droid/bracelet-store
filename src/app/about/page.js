@@ -1,110 +1,40 @@
+import Link from 'next/link'
 import AboutForm from './ContactForm'
-import { getLocale, t } from '@/lib/i18n-server'
+import { getLocale } from '@/lib/i18n-server'
+import { timingPath } from '@/lib/timing'
 
 export default function AboutPage() {
-  const locale = getLocale();
-  const tr = (key, p) => t(locale, key, p);
+  const en = getLocale() === 'en'
+
   return (
-    <div className="cloud-bg">
-      {/* Hero */}
-      <section className="bg-chinese-ink py-20 relative overflow-hidden">
-        <div className="lattice-pattern absolute inset-0 opacity-10" />
-        <div className="max-w-4xl mx-auto px-4 text-center relative">
-          <div className="inline-block border border-chinese-gold/50 px-4 py-1 mb-6">
-            <span className="text-chinese-gold text-xs tracking-[0.3em]">{tr('about.title')}</span>
+    <div className="timing-page">
+      <div className="timing-shell max-w-4xl py-12 md:py-16">
+        <p className="timing-kicker">{en ? 'Zen Craft Bracelets' : '禅意手作'}</p>
+        <h1 className="mt-3 text-4xl sm:text-5xl">{en ? 'Time in Detail' : '时间有迹'}</h1>
+        <p className="mt-5 max-w-2xl leading-relaxed text-stone-700">{en
+          ? 'A bracelet can mark a quiet daily ritual, the start of something new, or a moment shared with someone else. Time in Detail is how we bring those occasions together.'
+          : '一串手串，可以陪你度过平常的一天，也可以记住一次出发，或送给一个重要的人。「时间有迹」把这些佩戴的理由放在一起。'}</p>
+        <section className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="timing-card p-5">
+            <h2 className="text-xl">{en ? 'Design inspiration' : '设计灵感'}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-stone-700">{en
+              ? 'Stillness, New Paths and Connections are three ways to choose a bracelet by the occasion you have in mind.'
+              : '山序、行迹、相赠，对应日常、出发与赠礼。按你想记下的时刻选一串。'}</p>
+            <Link href={timingPath} className="timing-link mt-3 inline-block text-sm">{en ? 'Explore the collection' : '浏览系列'}</Link>
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-6">
-            {tr('about.title')}
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            {tr('about.desc')}
-          </p>
-        </div>
-      </section>
-
-      {/* Brand Story */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="w-full aspect-square bg-chinese-ivory-dark border border-chinese-gold/20 flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="w-20 h-20 border-2 border-chinese-gold flex items-center justify-center mx-auto mb-4">
-                  <span className="text-chinese-gold text-3xl font-serif">禅</span>
-                </div>
-                <p className="text-gray-400 text-sm">品牌形象展示</p>
-              </div>
-            </div>
+          <div className="timing-card p-5">
+            <h2 className="text-xl">{en ? 'How we describe materials' : '我们如何介绍材质'}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-stone-700">{en
+              ? 'Our archive identifies which details come from product listings and which come from supplier imagery.'
+              : '产品档案标明当前资料来自商品记录还是供应商图片。能公开的检测或批次资料会注明适用范围。'}</p>
+            <Link href="/archive" className="timing-link mt-3 inline-block text-sm">{en ? 'Open the archive' : '查阅产品档案'}</Link>
           </div>
-          <div>
-            <h2 className="font-serif text-3xl text-chinese-ink mb-6">{tr('about.brand')}</h2>
-            <div className="w-16 h-0.5 bg-chinese-gold mb-6" />
-            <div className="space-y-4 text-gray-600 leading-relaxed">
-              <p>
-                禅意手作诞生于对中国传统文化的热爱。我们相信，每一块木材、每一颗石材都有它独特的纹理和故事。
-              </p>
-              <p>
-                我们的工匠团队遍访中国各地，精选紫檀、黄花梨、和田玉、玛瑙等优质原材料，
-                以传统手工技艺精心打磨，保留材质的天然美感。
-              </p>
-              <p>
-                每一串手串都承载着东方美学的精髓——简约而不简单，内敛而不失韵味。
-                我们希望通过这些手作，让更多人感受到自然与匠心的温度。
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Process */}
-      <section className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="chinese-section-title">{tr('about.craft')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {[
-              { step: '01', title: tr('about.craft1'), desc: '精选优质天然木材与石材，严格筛选每一块原材料' },
-              { step: '02', title: tr('about.craft2'), desc: '依照纹理精细切割，最大程度保留材质的天然美感' },
-              { step: '03', title: tr('about.craft3'), desc: '多道手工打磨工序，确保每一颗珠子圆润光滑' },
-              { step: '04', title: tr('about.craft4'), desc: '匠心串制，精心搭配，成就值得珍藏的手作精品' },
-            ].map((item) => (
-              <div key={item.step} className="text-center p-6">
-                <div className="w-16 h-16 border-2 border-chinese-gold flex items-center justify-center mx-auto mb-4">
-                  <span className="text-chinese-gold font-serif text-xl">{item.step}</span>
-                </div>
-                <h3 className="font-serif text-lg text-chinese-ink mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-          <div>
-            <h2 className="font-serif text-3xl text-chinese-ink mb-6">{tr('about.contactForm')}</h2>
-            <div className="w-16 h-0.5 bg-chinese-gold mb-6" />
-            <div className="space-y-4 text-gray-600">
-              <p>有任何问题或合作意向，欢迎随时联系我们。</p>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-chinese-gold">✉</span>
-                  <span>hello@zencraft.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-chinese-gold">✆</span>
-                  <span>+86 400-888-8888</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-chinese-gold">◉</span>
-                  <span>中国 · 苏州 · 工业园区</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        </section>
+        <section id="contact" className="mt-12 scroll-mt-24">
+          <h2 className="timing-heading">{en ? 'Contact us' : '联系我们'}</h2>
           <AboutForm />
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   )
 }

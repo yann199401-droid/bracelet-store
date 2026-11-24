@@ -98,19 +98,19 @@ export default async function ProductsPage({ searchParams }) {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE)
 
   return (
-    <div className="cloud-bg min-h-screen">
+    <div className="timing-page">
       {/* Header */}
-      <section className="bg-chinese-ink py-12">
+      <section className="border-b border-stone-200 bg-[#eee5d7] py-10">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">{tr('products.title')}</h1>
+          <h1 className="text-3xl md:text-4xl font-serif text-stone-900 mb-2">{tr('products.title')}</h1>
           {search && (
-            <p className="text-gray-400">{tr('products.searchEmpty', { query: search })} ({total})</p>
+            <p className="text-stone-700">{tr('products.searchEmpty', { query: search })} ({total})</p>
           )}
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Link href="/collections/timing" className="mb-6 inline-block text-sm text-chinese-red underline underline-offset-4">
+        <Link href="/collections/timing" className="mb-6 inline-block timing-link text-sm">
           {locale === 'en' ? 'Preview ten new designs' : '浏览「时间有迹」首批十款新品'}
         </Link>
         {/* Filters */}

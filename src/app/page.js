@@ -1,183 +1,100 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import ProductGrid from '@/components/product/ProductGrid'
-import StarRating from '@/components/ui/StarRating'
-import { getLocale, t } from '@/lib/i18n-server'
+import { getLocale } from '@/lib/i18n-server'
+import { series, timingPath } from '@/lib/timing'
+import catalog from './collections/timing/catalog.json'
 
 export const dynamic = 'force-dynamic'
 
-export async function generateMetadata() {
-  const locale = getLocale()
+export function generateMetadata() {
+  const en = getLocale() === 'en'
   return {
-    title: locale === 'en' ? 'Zen Craft Bracelets — Natural Wood & Stone Bracelets' : '禅意手作 — 天然木石手串，手工禅意饰品',
-    description: locale === 'en'
-      ? 'Handcrafted bracelets from natural wood and rare stone. Timeless Eastern aesthetics, artisan spirit in every bead.'
-      : '精选印度小叶紫檀、海南黄花梨、和田玉等天然材质，手工打磨每一颗珠粒。匠心独具，传承东方美学。',
+    title: en ? 'Time in Detail · Beaded Bracelets' : '时间有迹 · 木石手串',
+    description: en
+      ? 'Explore beaded bracelets for everyday wear, new beginnings and gifts. Compare designs, materials and wrist sizes.'
+      : '把重要的时光留在腕间。按日常、出发和赠礼选手串，查看款式、材质与手围。',
+    alternates: { canonical: '/' },
   }
 }
 
 export default async function HomePage() {
   const locale = getLocale()
-  const tr = (key, params) => t(locale, key, params)
-
-  const featuredProducts = await prisma.product.findMany({
-    where: { featured: true, active: true },
-    take: 8,
+  const en = locale === 'en'
+  const featured = await prisma.product.findMany({
+    where: { featured: true, active: true, stock: { gt: 0 } },
+    take: 4,
     orderBy: { createdAt: 'desc' },
   })
-
-  const recentProducts = await prisma.product.findMany({
-    where: { active: true },
-    take: 8,
-    orderBy: { createdAt: 'desc' },
-  })
-
-  const topReviews = await prisma.productReview.findMany({
-    take: 3,
-    orderBy: { createdAt: 'desc' },
-    include: { product: true, user: true },
-  })
-
-  const categories = [
-    { key: 'WOOD', label: tr('home.woodBracelets'), desc: tr('home.woodDesc'), icon: '木', color: 'bg-amber-800' },
-    { key: 'STONE', label: tr('home.stoneBracelets'), desc: tr('home.stoneDesc'), icon: '石', color: 'bg-slate-600' },
-    { key: 'MIXED', label: tr('home.mixedBracelets'), desc: tr('home.mixedDesc'), icon: '合', color: 'bg-chinese-red' },
-  ]
 
   return (
-    <div className="cloud-bg">
-      {/* Hero Banner */}
-      <section className="relative bg-chinese-ink overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="/images/banners/hero-bracelet.jpg"
-            alt={tr('home.heroTitle')}
-            loading="lazy"
-            className="w-full h-full object-cover opacity-70"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-chinese-ink/70 via-chinese-ink/40 to-chinese-ink/10" />
-        </div>
-        <div className="lattice-pattern absolute inset-0 opacity-20" />
-        <div className="max-w-7xl mx-auto px-4 py-20 md:py-32 relative">
-          <div className="max-w-2xl">
-            <div className="inline-block border border-chinese-gold/50 px-4 py-1 mb-6">
-              <span className="text-chinese-gold text-xs tracking-[0.3em] uppercase">{tr('nav.brandSub')}</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white leading-tight mb-6">
-              {locale === 'en' ? (
-                <>{tr('home.heroTitle')}</>
-              ) : (
-                <>
-                  指尖<span className="text-chinese-gold">禅意</span>
-                  <br />自然于心
-                </>
-              )}
-            </h1>
-            <p className="text-gray-400 text-base md:text-lg mb-8 leading-relaxed max-w-xl">
-              {locale === 'en' ? tr('home.heroDesc') : '精选天然木材与珍稀石材，手工打磨每一颗珠粒。让大自然的温度，陪伴你的每一天。'}
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/collections/timing" className="chinese-btn-gold text-base px-8 py-3">
-                {locale === 'en' ? 'Preview the new collection' : '浏览「时间有迹」新品'}
-              </Link>
-              <Link href="/products" className="chinese-btn-primary text-base px-8 py-3">
-                {tr('home.exploreBtn')}
-              </Link>
-              <Link href="/about" className="chinese-btn-outline text-base px-8 py-3 border-white/30 text-white hover:bg-white/10">
-                {tr('home.learnMore')}
-              </Link>
-            </div>
+    <div className="timing-page">
+      <section className="timing-shell grid items-center gap-8 py-12 md:grid-cols-2 md:py-20">
+        <div>
+          <p className="timing-kicker">{en ? 'Time in Detail' : '时间有迹'}</p>
+          <h1 className="mt-3 max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl">
+            {en ? 'Wear the moments that matter.' : '把重要的时光，留在腕间。'}
+          </h1>
+          <p className="mt-5 max-w-md text-base leading-relaxed text-stone-700">
+            {en ? 'Wood and stone bead bracelets for everyday rituals, new beginnings and the people you think of.' : '从木石纹理里选一串，陪伴日常，纪念出发，也送给想念的人。'}
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href={timingPath} className="timing-button">{en ? 'Explore the collection' : '探索系列'}</Link>
+            <Link href="/products" className="timing-button timing-button-secondary">{en ? 'Shop bracelets' : '选购手串'}</Link>
           </div>
+        </div>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-200">
+          <Image src="/images/banners/hero-bracelet.jpg" alt={en ? 'Beaded bracelets' : '手串与珠饰'} fill priority
+            sizes="(max-width: 767px) 100vw, 50vw" className="object-cover" />
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <h2 className="chinese-section-title">{tr('home.categories')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {categories.map((cat) => (
-            <Link
-              key={cat.key}
-              href={`/products?material=${cat.key}`}
-              className="chinese-card group hover:shadow-chinese-lg transition-all duration-300"
-            >
-              <div className="p-8 text-center">
-                <div className={`w-16 h-16 ${cat.color} flex items-center justify-center mx-auto mb-4
-                                group-hover:scale-110 transition-transform duration-300`}>
-                  <span className="text-white text-2xl font-serif">{cat.icon}</span>
+      <section className="timing-shell pb-14">
+        <h2 className="timing-heading">{en ? 'Explore by occasion' : '为不同的时刻选一串'}</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {series.map((item) => {
+            const design = catalog.find(({ id }) => id === item.designs[0])
+            return (
+              <Link key={item.id} href={`${timingPath}?series=${item.id}`} className="timing-card group">
+                <div className="relative aspect-[4/3] overflow-hidden bg-white">
+                  <Image src={design.image} alt={design.name[locale]} fill sizes="(max-width: 639px) 100vw, 33vw"
+                    className="object-contain p-5 transition-transform motion-safe:group-hover:scale-105" />
                 </div>
-                <h3 className="font-serif text-xl text-chinese-ink mb-2">{cat.label}</h3>
-                <p className="text-sm text-gray-500">{cat.desc}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="bg-white py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="chinese-section-title">{tr('home.featured')}</h2>
-          {featuredProducts.length > 0 ? (
-            <ProductGrid products={featuredProducts} />
-          ) : (
-            <p className="text-center text-gray-400">{tr('products.empty')}</p>
-          )}
-          <div className="text-center mt-12">
-            <Link href="/products" className="chinese-btn-outline">{tr('home.viewAll')}</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* New Arrivals */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="chinese-section-title">{tr('home.newArrivals')}</h2>
-          {recentProducts.length > 0 ? (
-            <ProductGrid products={recentProducts} />
-          ) : (
-            <p className="text-center text-gray-400">{tr('products.empty')}</p>
-          )}
-        </div>
-      </section>
-
-      {/* Reviews */}
-      <section className="bg-chinese-ink py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="chinese-section-title !text-white !after:bg-chinese-gold">{tr('home.testimonials')}</h2>
-          {topReviews.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {topReviews.map((review) => (
-                <div key={review.id} className="bg-chinese-ink-light p-6 border border-chinese-gold/10">
-                  <StarRating rating={review.rating} />
-                  <p className="text-gray-300 text-sm mt-3 mb-4 leading-relaxed">&ldquo;{review.content}&rdquo;</p>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-chinese-gold">{review.user.name}</span>
-                    <span className="text-gray-500">{review.product.name}</span>
-                  </div>
+                <div className="p-5">
+                  <p className="timing-kicker">{item.occasion[locale]}</p>
+                  <h3 className="mt-1 text-2xl">{item.name[locale]}</h3>
+                  <p className="mt-2 text-sm text-stone-700">{item.story[locale]}</p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-gray-500">{tr('product.noReviews')}</p>
-          )}
+              </Link>
+            )
+          })}
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-20">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="font-serif text-3xl text-chinese-ink mb-4">{tr('home.newsletter')}</h2>
-          <p className="text-gray-500 mb-8">{tr('home.newsletterDesc')}</p>
-          <div className="flex max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder={tr('home.newsletterPlaceholder')}
-              className="chinese-input flex-1"
-            />
-            <button className="chinese-btn-primary">{tr('home.newsletterBtn')}</button>
+      {featured.length > 0 && (
+        <section className="border-y border-stone-200 bg-white/60">
+          <div className="timing-shell py-12">
+            <h2 className="timing-heading">{en ? 'Available to shop' : '现货选购'}</h2>
+            <ProductGrid products={featured} />
+            <Link href="/products" className="timing-link mt-6 inline-block">{en ? 'Browse all products' : '浏览全部商品'}</Link>
           </div>
-        </div>
+        </section>
+      )}
+
+      <section className="timing-shell grid gap-4 py-12 sm:grid-cols-3">
+        <Link href="/archive" className="timing-card p-6">
+          <h2 className="text-2xl">{en ? 'Product archive' : '产品档案'}</h2>
+          <p className="mt-2 text-sm text-stone-700">{en ? 'Look up a style and see where its material information comes from.' : '按款式编号或 SKU 查阅规格，了解材质信息来自哪里。'}</p>
+        </Link>
+        <Link href="/guide" className="timing-card p-6">
+          <h2 className="text-2xl">{en ? 'Fit and care' : '手围和保养'}</h2>
+          <p className="mt-2 text-sm text-stone-700">{en ? 'Measure your wrist, choose a gift, or ask about caring for your bracelet.' : '量手围、选礼物、了解日常保养和联系售后。'}</p>
+        </Link>
+        <Link href="/blog" className="timing-card p-6">
+          <h2 className="text-2xl">{en ? 'Journal' : '时间有迹手记'}</h2>
+          <p className="mt-2 text-sm text-stone-700">{en ? 'Read about materials, wearing and giving.' : '看一串的来历，找佩戴灵感与赠礼建议。'}</p>
+        </Link>
       </section>
     </div>
   )
