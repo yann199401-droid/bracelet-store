@@ -1,199 +1,91 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/AuthContext'
-import { useToast } from '@/lib/ToastContext'
 import { useI18n } from '@/lib/I18nContext'
+import { FREE_SHIPPING_MINIMUM_CENTS, REFERRAL_COMMISSION_PERCENT } from '@/lib/promotions'
 
 export default function PromotionsPage() {
-  const { t } = useI18n()
   const { user, loading } = useAuth()
-  const toast = useToast()
+  const { locale } = useI18n()
+  const en = locale === 'en'
   const [stats, setStats] = useState(null)
-  const [statsLoading, setStatsLoading] = useState(true)
+  const [failed, setFailed] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    if (!loading && user) {
-      fetch('/api/referral/stats')
-        .then((r) => r.json())
-        .then((data) => { setStats(data); setStatsLoading(false) })
-        .catch(() => setStatsLoading(false))
-    } else if (!loading && !user) {
-      setStatsLoading(false)
-    }
-  }, [user, loading])
+    setStats(null)
+    setFailed(false)
+    setCopied(false)
+    if (!user?.id) return
 
-  const copyLink = () => {
-    if (stats?.referralLink) {
-      navigator.clipboard.writeText(stats.referralLink)
-      toast.success(t('promotions.copied'))
+    const controller = new AbortController()
+    fetch('/api/referral/stats', { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('Referral stats unavailable')
+        return response.json()
+      })
+      .then(setStats)
+      .catch(() => {
+        if (!controller.signal.aborted) setFailed(true)
+      })
+    return () => controller.abort()
+  }, [user?.id])
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(stats.referralLink)
+      setCopied(true)
+    } catch {
+      setCopied(false)
     }
   }
 
+  const minimum = FREE_SHIPPING_MINIMUM_CENTS / 100
   return (
-    <div className="cloud-bg min-h-screen">
-      {/* Hero */}
-      <section className="bg-chinese-ink py-16 relative overflow-hidden">
-        <div className="lattice-pattern absolute inset-0 opacity-10" />
-        <div className="max-w-4xl mx-auto px-4 text-center relative">
-          <div className="inline-block border border-chinese-gold/50 px-4 py-1 mb-6">
-            <span className="text-chinese-gold text-xs tracking-[0.3em]">PROMOTION</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-serif text-white mb-4">
-            {t('promotions.title')}
-          </h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            {t('promotions.subtitle')}
-          </p>
-        </div>
-      </section>
+    <div className="timing-page">
+      <div className="timing-shell max-w-4xl space-y-5 py-12">
+        <h1 className="timing-heading">{en ? 'Shipping and referrals' : '包邮与邀请奖励'}</h1>
+        <section className="timing-card p-6">
+          <h2 className="text-2xl">{en ? `Free shipping on US$${minimum}+` : `满 US$${minimum} 包邮`}</h2>
+          <p className="mt-2 text-sm text-stone-700">{en
+            ? 'Applies to the merchandise total after discounts in supported destinations. Below US$200, request a quote for the actual shipping cost.'
+            : '按优惠后的商品金额计算，适用于支持的配送地区。不满 US$200，请先联系客服确认实际运费。'}</p>
+        </section>
+        <section className="timing-card p-6">
+          <h2 className="text-2xl">{en ? `Earn ${REFERRAL_COMMISSION_PERCENT}% for a referral` : `邀请新客返佣 ${REFERRAL_COMMISSION_PERCENT}%`}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-stone-700">{en
+            ? 'Invite a friend to register through your link and place their first paid order while signed in. Commission applies to merchandise after discounts, excluding shipping and tax. Refunds and eligibility are reviewed before settlement.'
+            : '好友通过专属链接注册，并登录完成首笔付款订单后，按优惠后的商品金额计算返佣，运费和税费不计入。退款及资格在结算前核对。'}</p>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* Campaign Rules */}
-        <div className="chinese-card p-8 mb-8">
-          <h2 className="font-serif text-2xl text-chinese-ink mb-6">{t('promotions.rules')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { step: '1', title: t('promotions.step1Title'), desc: t('promotions.step1') },
-              { step: '2', title: t('promotions.step2Title'), desc: t('promotions.step2') },
-              { step: '3', title: t('promotions.step3Title'), desc: t('promotions.step3') },
-            ].map((item) => (
-              <div key={item.step} className="text-center p-4">
-                <div className="w-14 h-14 border-2 border-chinese-gold flex items-center justify-center mx-auto mb-3">
-                  <span className="text-chinese-gold font-serif text-xl">{item.step}</span>
-                </div>
-                <h3 className="font-serif text-base text-chinese-ink mb-1">{item.title}</h3>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+          {stats && user ? (
+            <div className="mt-6 space-y-4">
+              <p className="text-sm">
+                {en ? 'Registered referrals' : '已注册好友'} {stats.referralCount}
+                <span className="mx-3 text-stone-500">·</span>
+                {en ? 'Commission pending review' : '待核对佣金'} US${(stats.commissionCents / 100).toFixed(2)}
+              </p>
+              <div className="flex flex-wrap items-end gap-2">
+                <label className="min-w-0 flex-1 text-sm">
+                  {en ? 'Your referral link' : '专属邀请链接'}
+                  <input readOnly value={stats.referralLink} onFocus={(event) => event.target.select()}
+                    className="mt-1 block w-full rounded border border-stone-300 bg-white px-3 py-2.5" />
+                </label>
+                <button type="button" onClick={copyLink} className="timing-button">
+                  {copied ? (en ? 'Copied' : '已复制') : (en ? 'Copy link' : '复制链接')}
+                </button>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-6 p-4 bg-chinese-ivory-dark/50 border border-chinese-gold/20">
-            <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-chinese-gold flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div className="text-sm text-gray-600">
-                <p className="font-medium mb-1">{t('promotions.couponRules')}</p>
-                <ul className="list-disc list-inside space-y-1 text-gray-500">
-                  <li>{t('promotions.couponRule1')}</li>
-                  <li>{t('promotions.couponRule2')}</li>
-                  <li>{t('promotions.couponRule3')}</li>
-                  <li>{t('promotions.couponRule4')}</li>
-                </ul>
-              </div>
+              <Link href="/about#contact" className="timing-link inline-block text-sm">{en ? 'Ask about settlement' : '联系处理佣金结算'}</Link>
             </div>
-          </div>
-        </div>
-
-        {/* Referral Section */}
-        {loading ? (
-          <div className="chinese-card p-8 text-center">
-            <div className="animate-pulse space-y-4">
-              <div className="h-6 w-48 bg-gray-200 mx-auto rounded" />
-              <div className="h-4 w-64 bg-gray-200 mx-auto rounded" />
-            </div>
-          </div>
-        ) : user ? (
-          <div className="chinese-card p-8">
-            <h2 className="font-serif text-xl text-chinese-ink mb-6">{t('promotions.myReferrals')}</h2>
-
-            {statsLoading ? (
-              <div className="animate-pulse space-y-4">
-                <div className="h-16 bg-gray-200 rounded" />
-                <div className="h-8 bg-gray-200 rounded" />
-              </div>
-            ) : stats ? (
-              <>
-                {/* Progress */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">{t('promotions.progress')}</span>
-                    <span className="text-sm text-chinese-gold font-medium">{t('promotions.of', { current: stats.referralCount, total: stats.target })}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 h-3">
-                    <div
-                      className="h-full bg-chinese-gold transition-all duration-500"
-                      style={{ width: `${Math.min(stats.progress, 100)}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Coupon Status */}
-                {stats.coupon ? (
-                  <div className="p-4 bg-green-50 border border-green-200 mb-6">
-                    <div className="flex items-center gap-2 mb-1">
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="font-medium text-green-800 text-sm">{t('promotions.couponTitle')}</span>
-                    </div>
-                    <p className="text-sm text-green-700 mb-2">
-                      {t('promotions.couponCode', { code: stats.coupon.code })}
-                    </p>
-                    <p className="text-xs text-green-600">
-                      {t('promotions.couponDiscount', { amount: '35', min: stats.coupon.minAmount })} · {stats.coupon.expiresAt ? t('promotions.couponExpires', { date: new Date(stats.coupon.expiresAt).toLocaleDateString('zh-CN') }) : t('promotions.couponPermanent')}
-                    </p>
-                  </div>
-                ) : stats.referralCount >= 3 ? (
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 mb-6">
-                    <p className="text-sm text-yellow-800">
-                      {t('promotions.pending')}
-                    </p>
-                  </div>
-                ) : null}
-
-                {/* Referral Link */}
-                <div className="mb-6">
-                  <label className="block text-sm text-gray-600 mb-2">{t('promotions.referralLink')}</label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={stats.referralLink}
-                      className="chinese-input flex-1 text-xs bg-gray-50"
-                    />
-                    <button onClick={copyLink} className="chinese-btn-primary whitespace-nowrap">
-                      {t('promotions.copyLink')}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Referral List */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">{t('promotions.friends')} ({stats.referralCount})</h3>
-                  {stats.referrals.length > 0 ? (
-                    <div className="space-y-2">
-                      {stats.referrals.map((r) => (
-                        <div key={r.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-                          <span className="text-sm text-gray-700">{r.referee.name}</span>
-                          <span className="text-xs text-gray-400">
-                            {new Date(r.createdAt).toLocaleDateString('zh-CN')}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-400 text-center py-4">{t('promotions.noFriends')}</p>
-                  )}
-                </div>
-              </>
-            ) : null}
-          </div>
-        ) : (
-          <div className="chinese-card p-8 text-center">
-            <p className="text-gray-500 mb-4">{t('promotions.loginRequired')}</p>
-            <Link href="/auth/login" className="chinese-btn-primary">{t('promotions.login')}</Link>
-          </div>
-        )}
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-8">
-          <Link href="/products" className="text-chinese-gold hover:text-chinese-gold-light text-sm transition-colors">
-            {t('promotions.browseAll')} →
-          </Link>
-        </div>
+          ) : loading || (user && !failed) ? (
+            <p role="status" className="mt-4 text-sm text-stone-700">{en ? 'Loading…' : '加载中…'}</p>
+          ) : user ? (
+            <p role="status" className="mt-4 text-sm text-stone-700">{en ? 'Referral information is temporarily unavailable.' : '邀请信息暂不可用。'}</p>
+          ) : (
+            <Link href="/auth/login?next=promotions" className="timing-button mt-5">{en ? 'Sign in for your referral link' : '登录获取邀请链接'}</Link>
+          )}
+        </section>
       </div>
     </div>
   )

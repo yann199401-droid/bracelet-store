@@ -23,7 +23,8 @@ export default function LoginPage() {
     const { ok, error } = await login(form.email, form.password)
     if (ok) {
       toast.success('登录成功，欢迎回来！')
-      router.push('/')
+      const next = new URLSearchParams(window.location.search).get('next')
+      router.push(next === 'promotions' ? '/promotions' : '/')
     } else {
       setError(error || '登录失败')
     }

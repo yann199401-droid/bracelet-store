@@ -38,6 +38,7 @@ export default function AdminLayout({ children }) {
     { href: '/admin/analytics', label: '数据面板', icon: '📊' },
     { href: '/admin', label: '概览', icon: '📋' },
     { href: '/admin/orders', label: '订单管理', icon: '📦' },
+    { href: '/admin/referrals', label: '邀请佣金', icon: '↗' },
     { href: '/admin/inquiries', label: '询盘管理', icon: '✉️' },
     { href: '/admin/blog', label: '博客管理', icon: '📝' },
     { href: '/admin/products', label: '产品管理', icon: '💎' },

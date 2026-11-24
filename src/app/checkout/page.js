@@ -6,6 +6,7 @@ import { useCart } from '@/lib/CartContext'
 import { useAuth } from '@/lib/AuthContext'
 import { useToast } from '@/lib/ToastContext'
 import { useI18n } from '@/lib/I18nContext'
+import { FREE_SHIPPING_MINIMUM_CENTS } from '@/lib/promotions'
 
 export default function CheckoutPage() {
   const { items, totalPrice } = useCart()
@@ -25,6 +26,10 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState('')
 
   const finalTotal = Math.max(totalPrice - couponDiscount, 0)
+  const needsShippingQuote = Math.round(finalTotal * 100) < FREE_SHIPPING_MINIMUM_CENTS
+  const en = locale === 'en'
+  const [shippingQuoteRequired, setShippingQuoteRequired] = useState(false)
+  const quoteOnly = needsShippingQuote || shippingQuoteRequired
 
   const validateCoupon = async () => {
     if (!couponCode.trim()) return
@@ -57,7 +62,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (items.length === 0) return
+    if (items.length === 0 || quoteOnly) return
     setSubmitting(true)
 
     try {
@@ -65,9 +70,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: items.map(({ id, name, price, quantity, images }) => ({ id, name, price, quantity, images })),
-          total: finalTotal,
-          discount: couponDiscount,
+          items: items.map(({ id, quantity }) => ({ id, quantity })),
           couponCode: couponStatus === 'valid' ? couponCode.trim() : undefined,
           customerName: form.customerName,
           customerEmail: form.customerEmail,
@@ -82,6 +85,7 @@ export default function CheckoutPage() {
         // Redirect to Stripe Checkout
         window.location.href = data.url
       } else {
+        if (data.code === 'SHIPPING_QUOTE_REQUIRED') setShippingQuoteRequired(true)
         toast.error(data.error || 'Failed to start payment')
         setSubmitting(false)
       }
@@ -175,15 +179,24 @@ export default function CheckoutPage() {
               </p>
             </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="chinese-btn-primary w-full text-center text-base py-3 disabled:opacity-50"
-            >
-              {submitting
-                ? (locale === 'en' ? 'Redirecting to payment...' : '跳转支付中...')
-                : (locale === 'en' ? `Pay $${finalTotal.toFixed(2)}` : `确认支付 $${finalTotal.toFixed(2)}`)}
-            </button>
+            {quoteOnly ? (
+              <div className="space-y-3">
+                <p className="text-sm text-stone-700">{en
+                  ? 'For orders below US$200, contact us with the product SKUs, quantities, country and postal code. We will confirm the actual shipping cost before arranging payment.'
+                  : '未满 US$200 的订单，请提供商品 SKU、件数、收货国家和邮编。客服确认实际运费后再安排付款。'}</p>
+                <Link href="/about#contact" className="timing-button">{en ? 'Request a shipping quote' : '联系确认运费'}</Link>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={submitting}
+                className="chinese-btn-primary w-full text-center text-base py-3 disabled:opacity-50"
+              >
+                {submitting
+                  ? (locale === 'en' ? 'Redirecting to payment...' : '跳转支付中...')
+                  : (locale === 'en' ? `Pay $${finalTotal.toFixed(2)}` : `确认支付 $${finalTotal.toFixed(2)}`)}
+              </button>
+            )}
           </form>
 
           {/* Order Summary */}
@@ -260,10 +273,10 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex justify-between mt-1">
                   <span className="text-sm text-gray-500">{t('checkout.shipping')}</span>
-                  <span className="text-sm text-green-600">{t('checkout.free')}</span>
+                  <span className="text-sm text-green-600">{quoteOnly ? (en ? 'Actual cost · quote required' : '按实际运费 · 待报价') : t('checkout.free')}</span>
                 </div>
                 <div className="flex justify-between mt-3 pt-3 border-t border-gray-100">
-                  <span className="text-base font-serif text-chinese-ink">{t('checkout.total')}</span>
+                  <span className="text-base font-serif text-chinese-ink">{quoteOnly ? (en ? 'Total before shipping' : '商品小计（未含运费）') : t('checkout.total')}</span>
                   <span className={`text-xl font-serif font-bold ${couponDiscount > 0 ? 'text-green-600' : 'text-chinese-red'}`}>
                     ${finalTotal.toFixed(2)}
                   </span>

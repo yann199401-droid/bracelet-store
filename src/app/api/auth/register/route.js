@@ -18,33 +18,13 @@ export async function POST(request) {
 
     // Track referral if ref parameter is provided
     if (ref) {
-      const referrerId = parseInt(ref)
-      if (!isNaN(referrerId) && referrerId !== user.id) {
+      const referrerId = Number(ref)
+      if (Number.isSafeInteger(referrerId) && referrerId > 0 && referrerId !== user.id) {
         const referrerExists = await prisma.user.findUnique({ where: { id: referrerId } })
         if (referrerExists) {
           await prisma.referral.create({
             data: { referrerId, refereeId: user.id },
           })
-
-          // Check if referrer now has 3 referrals → generate coupon
-          const referralCount = await prisma.referral.count({ where: { referrerId } })
-          if (referralCount >= 3) {
-            const existingCoupon = await prisma.coupon.findFirst({
-              where: { userId: referrerId, code: { startsWith: 'ZEN35-' } },
-            })
-            if (!existingCoupon) {
-              const code = `ZEN35-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
-              await prisma.coupon.create({
-                data: {
-                  code,
-                  discount: 35,
-                  minAmount: 80,
-                  userId: referrerId,
-                  expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
-                },
-              })
-            }
-          }
         }
       }
     }

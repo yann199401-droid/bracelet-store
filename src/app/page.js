@@ -30,23 +30,25 @@ export default async function HomePage() {
 
   return (
     <div className="timing-page">
-      <section className="timing-shell grid items-center gap-8 py-12 md:grid-cols-2 md:py-20">
-        <div>
-          <p className="timing-kicker">{en ? 'Time in Detail' : '时间有迹'}</p>
-          <h1 className="mt-3 max-w-xl text-4xl leading-tight sm:text-5xl lg:text-6xl">
+      <section className="relative overflow-hidden bg-chinese-ink">
+        <Image src="/images/banners/hero-bracelet.jpg" alt="" fill priority sizes="100vw"
+          className="object-cover opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/10" />
+        <div className="lattice-pattern absolute inset-0 opacity-20" />
+        <div className="relative mx-auto max-w-7xl px-4 py-20 md:py-32">
+          <p className="text-sm font-medium text-chinese-gold-light">{en ? 'Time in Detail' : '时间有迹'}</p>
+          <h1 className="mt-3 max-w-3xl text-4xl leading-tight text-white md:text-6xl lg:text-7xl">
             {en ? 'Wear the moments that matter.' : '把重要的时光，留在腕间。'}
           </h1>
-          <p className="mt-5 max-w-md text-base leading-relaxed text-stone-700">
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-stone-100">
             {en ? 'Wood and stone bead bracelets for everyday rituals, new beginnings and the people you think of.' : '从木石纹理里选一串，陪伴日常，纪念出发，也送给想念的人。'}
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href={timingPath} className="timing-button">{en ? 'Explore the collection' : '探索系列'}</Link>
-            <Link href="/products" className="timing-button timing-button-secondary">{en ? 'Shop bracelets' : '选购手串'}</Link>
+            <Link href="/products" className="inline-flex items-center rounded-md border border-white/60 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/10">
+              {en ? 'Shop bracelets' : '选购手串'}
+            </Link>
           </div>
-        </div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-200">
-          <Image src="/images/banners/hero-bracelet.jpg" alt={en ? 'Beaded bracelets' : '手串与珠饰'} fill priority
-            sizes="(max-width: 767px) 100vw, 50vw" className="object-cover" />
         </div>
       </section>
 
